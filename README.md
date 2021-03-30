@@ -6,12 +6,12 @@
 [![Dependencies](https://tinyverse.netlify.com/badge/mixtools)](https://cran.r-project.org/package=mixtools)
 ![GitHub last commit](https://img.shields.io/github/last-commit/dsy109/mixtools)
 [![Downloads](https://cranlogs.r-pkg.org/badges/mixtools?color=brightgreen)](https://www.r-pkg.org/pkg/mixtools)
-[![JSS](https://img.shields.io/badge/JSS-10.18637%2Fjss.v032.i06-brightgreen)](https://www.jstatsoft.org/article/view/v032i06)
+[![JSS](https://img.shields.io/badge/JSS-10.18637%2Fjss.v032.i06-brightgreen)](http://dx.doi.org/10.18637/jss.v032.i06)
 [![HAL](https://img.shields.io/badge/hal-00717545-brightgreen)](https://hal.archives-ouvertes.fr/hal-00717545/document)
 
 ### Synopsis
 
-The [mixtools package](https://cran.r-project.org/package=mixtools) provides functions for analyzing finite mixture models.  Parametric and semiparametric mixture models are handled.  Various tools are include for determining the number of components.   Visualizations include histograms with the estimated mixture model overlaid, 2D and 3D scatterplots for relevant mixture fits, and the [mixturegram](https://doi.org/10.1080/10618600.2017.1398093).    More details about the package are included in both the original [JSS](https://www.jstatsoft.org/article/view/v032i06) article as well as a technical report on the open archive [HAL](https://hal.archives-ouvertes.fr/hal-00717545/document).
+The [mixtools package](https://cran.r-project.org/package=mixtools) provides functions for analyzing finite mixture models.  Parametric and semiparametric mixture models are handled.  Various tools are include for determining the number of components.   Visualizations include histograms with the estimated mixture model overlaid, 2D and 3D scatterplots for relevant mixture fits, and the [mixturegram](https://doi.org/10.1080/10618600.2017.1398093).    More details about the package are included in both the original [JSS](http://dx.doi.org/10.18637/jss.v032.i06) article as well as a technical report on the open archive [HAL](https://hal.archives-ouvertes.fr/hal-00717545/document).
 
 Other highlights:
 
@@ -27,7 +27,7 @@ Other highlights:
 
 ### Documentation
 
-The [JSS](https://dx.doi.org/10.18637/jss.v036.i05) article and the [Handbook of Statistics](https://doi.org/10.1016/B978-0-444-63431-3.00008-5) book chapter both provide documentation about the tolerance package.  Moreover, the [help file](https://CRAN.R-project.org/package=tolerance) also documents the references used for each function.
+The [JSS](http://dx.doi.org/10.18637/jss.v032.i06) article and the technical report on [HAL](https://hal.archives-ouvertes.fr/hal-00717545/document) both provide documentation about the mixtools package.  Moreover, the [help file](https://CRAN.R-project.org/package=mixtools) also documents the references used for each function.
 
 ### Examples
 
