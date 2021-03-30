@@ -1,0 +1,17 @@
+Package: mixtools
+Version: 1.2.0
+Date: 2020-02-05
+Title: Tools for Analyzing Finite Mixture Models
+Authors@R: c(person("Derek", "Young", role = c("aut", "cre"),
+	email = "derek.young@uky.edu", comment = c(ORCID = "0000-0002-3048-3803")),
+	person("Tatiana", "Benaglia", role = "aut"),
+	person("Didier", "Chauveau", role = "aut"),
+	person("David", "Hunter", role = "aut"),
+	person("Ryan", "Elmore", role = "ctb"),
+	person("Thomas", "Hettmansperger", role = "ctb"),
+	person("Hoben", "Thomas", role = "ctb"),
+	person("Fengjuan", "Xuan", role = "ctb"))
+Depends: R (>= 3.5.0) 
+Imports: kernlab, MASS, segmented, stats, survival
+Description: Analyzes finite mixture models for various parametric and semiparametric settings.  This includes mixtures of parametric distributions (normal, multivariate normal, multinomial, gamma), various Reliability Mixture Models (RMMs), mixtures-of-regressions settings (linear regression, logistic regression, Poisson regression, linear regression with changepoints, predictor-dependent mixing proportions, random effects regressions, hierarchical mixtures-of-experts), and tools for selecting the number of components (bootstrapping the likelihood ratio test statistic, mixturegrams, and model selection criteria).  Bayesian estimation of mixtures-of-linear-regressions models is available as well as a novel data depth method for obtaining credible bands.  This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+License: GPL (>= 2) 

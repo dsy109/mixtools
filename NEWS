@@ -1,0 +1,90 @@
+Changes in mixtools 1.2.0
+============================
+* 2020-02-05
+
+* Fixed compatibility issues with R 4.0.0.
+
+* Modified the NAMESPACE to only import three functions from the kernlab package: kpca(), pcv(), and Q().
+
+* Modified gammamixEM() to reflect the developments in Young, Chen, Hewage, and Nilo-Poyanco (2019).  This includes the addition of the argument mom.start to use a method-of-moments starting value strategy, as well as the addition of the fix.alpha argument for estimating a common shape parameter across the different components.
+
+* Added the mixturegram() function to construct mixturegrams for determining the number of components, which was introduced by Young, Ke, and Zeng (2018).
+
+* Modified the way the mixing proportions were randomly generated in the poisregmix.init() and logisregmix.init() functions.  Previously, there was the possibility of generating too small of a mixing component, which could cause numerical instabilities.  Thanks to Xiaoqiong Fang for identifying this issue.
+
+
+Changes in mixtools 1.1.0
+============================
+* 2017-03-10
+
+* Properly registered native routines for internal C code to conform with R-devel checks.
+
+* Fixed some inconsistencies with the S3 methods used.
+
+* Added tauequivnormalmixEM() to search for a local maximum of the likelihood surface for a univariate finite mixture of normals with possible equality constraints on the stdev parameters.
+
+* Added expRMM_EM() for fitting univariate finite mixtures-of-exponentials with right censoring.  Some associated distribution functions for this calculation were also added.
+
+* Added weibullRMM_SEM(), which is a stochastic EM algorithm for estimating Reliability Mixture Models (RMM) with censoring.
+
+* Added spRMM_SEM(), which is a stochastic EM algorithm for estimating a semiparametric Scaling RMM with censoring.
+
+* Corrected an issue with loading WaterdataFull.
+
+* Removed dependency on 'boot' package and revised code in the appropriate functions.  Thanks to Tim Hesterberg and Karl Millar of Google for this suggestion.
+
+* Updated some help files.
+
+
+Changes in mixtools 1.0.4
+============================
+* 2016-01-11
+
+* Added mvnpEM() and some related functions, which are multivariate blocks extension to the npEM() function.
+
+* Updated some help files.
+
+
+Changes in mixtools 1.0.3
+============================
+* 2015-04-17
+
+* Updated the maintainer's contact e-mail.
+
+* Added a new npMSL() version, with k-fold cross-validation.
+
+* Fixed some errors in the examples due to change in format to the Waterdata dataset.
+
+* Updated some references.
+
+
+Changes in mixtools 1.0.2
+============================
+* 2014-05-13
+
+* Fixed an indexing error in the boot.comp() function.
+
+* Updated some references.
+
+
+Changes in mixtools 1.0.1
+============================
+* 2014-01-01
+
+* Fixed a small bug to the boot.comp() function.
+
+* Added more complete version of Waterdata dataset, which includes all 579 children originally measured along with age and sex information
+
+
+Changes in mixtools 1.0.0 
+============================
+* 2013-10-05
+
+* Started a NEWS file as of this version. New capabilities include:
+
+* A normalmixMMlc() function was added, for mixtures of univariate Normals with linear constraints on both the means and the variances parameters, requiring a MM-type algorithm.
+
+* A spEMsymlocN01() function was added, implementing a specific semiparametric EM-like algorithm for univariate mixture in False Discovery Rate (FDR) estimation, in which setup one component is known and set to the standard normal whereas the second component is semiparametric. Functions for plotting the results from this algorithm and for FDR estimation from its output have also been added.
+
+* Some documentation (Rd) files have been updated for examples, and some reference papers in EM-related Rd files have been updated.
+

@@ -1,0 +1,22 @@
+citHeader("To cite mixtools in publications use:")
+
+citEntry(entry = "Article",
+  title        = "{mixtools}: An {R} Package for Analyzing Finite Mixture Models",
+  author       = personList(as.person("Tatiana Benaglia"),
+                   as.person("Didier Chauveau"),
+                   as.person("David R. Hunter"),
+                   as.person("Derek Young")),
+  journal      = "Journal of Statistical Software",
+  year         = "2009",
+  volume       = "32",
+  number       = "6",
+  pages        = "1--29",
+  url          = "http://www.jstatsoft.org/v32/i06/",
+
+  textVersion  =
+  paste("Tatiana Benaglia, Didier Chauveau, David R. Hunter, Derek Young (2009).",
+        "mixtools: An R Package for Analyzing Finite Mixture Models.",
+        "Journal of Statistical Software, 32(6), 1-29.",
+        "URL http://www.jstatsoft.org/v32/i06/.")
+)
+

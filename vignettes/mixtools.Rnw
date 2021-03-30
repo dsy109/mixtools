@@ -1,0 +1,1616 @@
+\documentclass[nojss]{jss}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%% need no \usepackage{Sweave.sty}
+
+%\VignetteIndexEntry{mixtools for mixture models} 
+
+%% macros (Didier)
+\newcommand{\CF}{{\mathcal F}}
+\newcommand{\CN}{{\mathcal N}}
+
+\def\Bg{\mathbf{g}}
+\def\Bh{\mathbf{h}}
+\def\Bk{\mathbf{k}}
+\def\Bx{\mathbf{x}}
+\def\By{\mathbf{y}}
+\def\Bc{\mathbf{c}}
+\def\BC{\mathbf{C}}
+\def\Bz{\mathbf{z}}
+
+\newcommand{\argmax}{\mathop{\mbox{argmax}}}
+\def\bP{\mathbb{P}} % Probability
+\def\I{\mathbb I}   % indicator function
+\def\bE{\mathbb{E}} % expectation
+\def\bR{\mathbb{R}} % real line
+\newcommand{\f}{{\vec\theta}}
+\newcommand{\lb}{{\lambda}}
+
+\def\post{{p}}
+\def\defn{{\stackrel{\rm def}{=}}}
+\def\vec#1{\mathchoice{\mbox{\boldmath$\displaystyle\bf#1$}}
+{\mbox{\boldmath$\textstyle\bf#1$}}
+{\mbox{\boldmath$\scriptstyle\bf#1$}}
+{\mbox{\boldmath$\scriptscriptstyle\bf#1$}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% almost as usual
+\author{Tatiana Benaglia \\ Pennsylvania State University \And
+  Didier Chauveau \\ Universit\'e d'Orl\'eans \AND David R.~Hunter \\
+  Pennsylvania State University \And Derek S. Young \\ Pennsylvania
+  State University} \title{\pkg{mixtools}: An \proglang{R} Package for
+  Analyzing Finite Mixture Models}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Tatiana Benaglia, Didier Chauveau, David R.~Hunter, Derek
+  Young} %% comma-separated
+\Plaintitle{mixtools: An R Package for Analyzing Mixture
+  Models} %% without formatting
+\Shorttitle{mixtools for Mixture Models} %% a short title (if necessary)
+
+%% an abstract and keywords
+\Abstract{ The \pkg{mixtools} package for \proglang{R} provides a set of
+  functions for analyzing a variety of finite mixture models.  These
+  functions include both traditional methods, such as EM algorithms for
+  univariate and multivariate normal mixtures, and newer methods that
+  reflect some recent research in finite mixture models.  In the latter
+  category, \pkg{mixtools} provides algorithms for estimating parameters
+  in a wide range of different mixture-of-regression contexts, in
+  multinomial mixtures such as those arising from discretizing
+  continuous multivariate data, in nonparametric situations where the
+  multivariate component densities are completely unspecified, and in
+  semiparametric situations such as a univariate location mixture of
+  symmetric but otherwise unspecified densities.  Many of the algorithms
+  of the \pkg{mixtools} package are EM algorithms or are based on
+  EM-like ideas, so this article includes an overview of EM algorithms
+  for finite mixture models.  } \Keywords{cutpoint, EM algorithm,
+  mixture of regressions, model-based clustering, nonparametric mixture,
+  semiparametric mixture, unsupervised clustering}
+%, keywords, comma-separated, not capitalized, \proglang{Java}}
+\Plainkeywords{keywords, comma-separated, not capitalized,
+  Java} %% without formatting
+%% at least one keyword must be supplied
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{13}
+%% \Issue{9}
+%% \Month{September}
+%% \Year{2004}
+%% \Submitdate{2004-09-29}
+%% \Acceptdate{2004-09-29}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+Didier Chauveau\\
+Laboratoire MAPMO - UMR 7349 - F\'ed\'eration Denis Poisson\\
+Universit\'e d'Orl\'eans\\
+BP 6759, 45067 Orl\'eans cedex 2, FRANCE.\\
+E-mail: \email{didier.chauveau@univ-orleans.fr} \\
+URL: \url{http://www.univ-orleans.fr/mapmo/membres/chauveau/}\\
+\\
+David R.~Hunter\\
+Department of Statistics\\
+326 Thomas Building\\
+Pennsylvania State University\\
+University Park, PA 16802\\
+Telephone:  +1/814-863-0979\\
+Fax: +1/814-863-7114\\
+E-mail: \email{dhunter@stat.psu.edu} \\
+URL: \url{http://www.stat.psu.edu/~dhunter/}\\
+\\
+Tatiana Benaglia\\
+Department of Statistics, Penn State (see above)\\
+E-mail:  \email{tab321@stat.psu.edu} \\
+\\
+Derek Young\\
+Department of Statistics, Penn State (see above)\\
+E-mail:  \email{dsy109@psu.edu}
+}
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/1/31336-5053
+%% Fax: +43/1/31336-734
+
+%% for those who use Sweave please include the following line (with % symbols):
+%% need no \usepackage{Sweave.sty}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\SweaveOpts{concordance=FALSE}
+
+%% include your article here, just as usual
+%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
+
+\section[Introduction to finite mixtures and mixtools]{Introduction to
+  finite mixtures and \pkg{mixtools}}
+%% Note: If there is markup in \(sub)section, then it has to be escape
+%% as above.
+\label{s:intro}
+
+Authors' note: The original version of this vignette was produced using
+an article that appears in the {\it Journal of Statistical Software}
+(URL:  \url{http://www.jstatsoft.org/}); see
+\citet{Benaglia+Chauveau+Hunter+Young:2009}.
+
+Populations of individuals may often be divided into subgroups.  Yet
+even when we observe characteristics of these individuals that provide
+information about their subgroup memberships, we may not actually
+observe these memberships {\em per se}. The basic goal of the tools in
+the \pkg{mixtools} package (version 0.4.3, as of this writing) for
+\proglang{R} \citep{r2009} is to examine a sample of measurements to
+discern and describe subgroups of individuals, even when there is no
+observable variable that readily indexes into which subgroup an
+individual properly belongs.  This task is sometimes referred to as
+``unsupervised clustering'' in the literature, and in fact mixture
+models may be generally thought of as comprising the subset of
+clustering methods known as ``model-based clustering''.  The
+\pkg{mixtools} package is available from the Comprehensive \proglang{R}
+Archive Network at \url{http://CRAN.R-project.org/package=mixtools}.
+
+Finite mixture models may also be used in situations beyond those for
+which clustering of individuals is of interest.  For one thing, finite
+mixture models give descriptions of entire subgroups, rather than
+assignments of individuals to those subgroups (though the latter may be
+accomplished using mixture models).  Indeed, even the subgroups may not
+necessarily be of interest; sometimes finite mixture models merely
+provide a means for adequately describing a particular distribution,
+such as the distribution of residuals in a linear regression model where
+outliers are present.
+
+Whatever the goal of the modeler when employing mixture models, much of
+the theory of these models involves the assumption that the subgroups
+are distributed according to a particular parametric form --- and quite
+often this form is univariate or multivariate normal.  While
+\pkg{mixtools} does provide tools for traditional fitting of finite
+mixtures of univariate and multivariate normal distributions, it goes
+well beyond this well-studied realm.  Arising from recent research whose
+goal is to relax or modify the assumption of multivariate normality,
+\pkg{mixtools} provides computational techniques for finite mixture
+model analysis in which components are regressions, multinomial vectors
+arising from discretization of multivariate data, or even distributions
+that are almost completely unspecified.  This is the main feature that
+distinguishes \pkg{mixtools} from other mixture-related \proglang{R}
+packages, also available from the Comprehensive \proglang{R} Archive
+Network at \url{http://CRAN.R-project.org/}, such as \pkg{mclust}
+\citep{Fraley+Raftery:2009} and \pkg{flexmix} \citep{jss:Leisch:2004,
+  Grun+Leisch:2008}.  We briefly mention these two packages in
+Sections~\ref{section:EMexample} and \ref{section:pdmp}, respectively.
+
+To make the mixture model framework more concrete, suppose the possibly
+vector-valued random variables $\vec X_1, \ldots, \vec X_n$ are a simple
+random sample from a finite mixture of $m>1$ arbitrary distributions,
+which we will call {\em components} throughout this article.  The
+density of each $\vec X_i$ may be written
+\begin{equation}
+\label{mvmixture}
+g_{\f}(\vec x_i) = \sum_{j=1}^m\lambda_j\phi_j(\vec x_i), \quad
+\vec x_i\in\bR^r,
+\end{equation}
+where $\f=(\vec\lambda, \vec \phi) = (\lambda_1, \ldots, \lambda_m,
+\phi_1, \ldots, \phi_m)$ denotes the parameter and the $\lambda_m$ are
+positive and sum to unity.  We assume that the $\phi_j$ are drawn from
+some family $\cal F$ of multivariate density functions absolutely
+continuous with respect to, say, Lebesgue measure.  The representation
+\eqref{mvmixture} is not identifiable if no restrictions are placed on
+$\cal F$, where by ``identifiable'' we mean that $g_{\f}$ has a {\em
+  unique} representation of the form \eqref{mvmixture} and we do not
+consider that ``label-switching'' --- i.e., reordering the $m$ pairs
+$(\lambda_1, \phi_1), \ldots, (\lambda_m, \phi_m)$ --- produces a
+distinct representation.
+
+In the next sections we will sometimes have to distinguish between {\em
+  parametric} and more general {\em nonparametric} situations.  This
+distinction is related to the structure of the family $\CF$ of
+distributions to which the component densities $\phi_j$ in model
+\eqref{mvmixture} belong.  We say that the mixture is {\em parametric}
+if $\CF$ is a parametric family, $\CF = \{\phi(\cdot|\vec\xi),
+\vec\xi\in\bR^d\}$, indexed by a ($d$-dimensional) Euclidean parameter
+$\vec\xi$.  A parametric family often used is the univariate Gaussian
+family $\CF = \{\phi(\cdot|\mu,\sigma^2)=\mbox{density of
+}\CN(\mu,\sigma^2), (\mu,\sigma^2)\in\bR\times\bR^+_*\}$, in which case
+the model parameter reduces to $\f = (\vec \lambda,
+(\mu_1,\sigma^2_1),\ldots,(\mu_m,\sigma^2_m))$.  For the multivariate
+case, a possible parametric model is the {\em conditionally i.i.d.\
+  normal model}, for which $\CF=\{\phi(\vec x_i) = \prod_{k=1}^r
+f(x_{ik}), \mbox{$f(t)$ density of $\CN(\mu,\sigma^2)$}\}$ (this model
+is included in \pkg{mixtools}; see Section~\ref{ss:nbcomp}).  An example
+of a (multivariate) nonparametric situation is $\CF=\{\phi(\vec x_i) =
+\prod_{k=1}^r f(x_{ik}), \mbox{$f(t)$ a univariate density on $\bR$}\}$, in
+which case $\vec\f$ consists in a Euclidean part ($\vec\lb$) and a
+nonparametric part $(f_1,\ldots,f_m)$.
+
+As a simple example of a dataset to which mixture models may be applied,
+consider the sample depicted in Figure \ref{geyser}. In the Old Faithful
+dataset, measurements give time in minutes between eruptions of the Old
+Faithful geyser in Yellowstone National Park, USA. These data are
+included as part of the \pkg{datasets} package in \proglang{R}
+\citep{r2009}; type \code{help("faithful")} in \proglang{R} for more
+details.
+
+<<faithful, echo=TRUE, results=hide>>=
+library(mixtools)
+data(faithful)
+attach(faithful)
+@
+
+\setkeys{Gin}{width=0.6\textwidth}
+\begin{figure}[h]
+  \centering
+<<geyser, fig=TRUE, eps=FALSE>>=
+hist(waiting, main="Time between Old Faithful eruptions",
+     xlab="Minutes",  ylab="", cex.main=1.5, cex.lab=1.5, cex.axis=1.4)
+@
+\caption{The Old Faithful dataset is clearly suggestive of a
+  two-component mixture of symmetric components.}
+\label{geyser}
+\end{figure}
+
+For the Old Faithful eruption data, a two-component mixture
+model is clearly a reasonable model based on the bimodality evident in
+the histogram. This example is analyzed by \citet{hunter2007ims}, who
+compare a standard normal-mixture method for fitting it with a novel
+semiparametric approach.  Both approaches are included in
+\pkg{mixtools}; see Sections \ref{section:EMexample} and
+\ref{section:SPexample} of this article.
+
+In Section~\ref{section:EM} of the current article we review the
+well-known class of EM algorithms for finite mixture models, a common
+thread that runs throughout much of the rest of the article.  The
+remaining sections discuss various categories of functions found in the
+\pkg{mixtools} package, from cutpoint methods that relax distributional
+assumptions for multivariate data by discretizing the data
+(Section~\ref{section:cut}), to semi- and non-parametric methods that
+eliminate distributional assumptions almost entirely depending on what
+the identifiability of the model allows (Section~\ref{section:np}), to
+methods that handle various mixtures of regressions
+(Section~\ref{section:reg}).  Finally, Section \ref{section:misc}
+describes several miscellaneous features of the \pkg{mixtools} package.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{EM algorithms for finite mixtures}
+\label{section:EM}
+
+
+\subsection{Missing data setup}
+
+Much of the general methodology used in \pkg{mixtools} involves the
+representation of the mixture problem as a particular case of maximum
+likelihood estimation (MLE) when the observations can be viewed as
+incomplete data.  This setup implies consideration of two sample spaces,
+the sample space of the (incomplete) observations, and a sample space of
+some ``complete'' observations, the characterization of which being that
+the estimation can be performed explicitly at this level.  For instance,
+in parametric situations, the MLE based on the complete data may exist
+in closed form.  Among the numerous reference papers and monographs on
+this subject are, e.g., the original EM algorithm paper by
+\citet{dempster1977mli} and the finite mixture model book by
+\citet{mclachlan2000fmm} and references therein.  We now give a brief
+description of this setup as it applies to finite mixture models in
+general.
+
+The (observed) data consist of $n$ i.i.d. observations $\vec x = (\vec
+x_1,\ldots,\vec x_n)$ from a density $g_\f$ given by
+\eqref{mvmixture}. It is common to denote the density of the sample by
+$\Bg_\f$, the $n$-fold product of $g_\f$, so that we write simply
+$\Bx\sim \Bg_\f$. In the missing data setup, $\Bg_\f$ is called the
+incomplete-data density, and the associated log-likelihood is
+$L_{\Bx}(\f) = \sum_{i=1}^n \log g_\f(\vec x_i)$. The (parametric) ML
+estimation problem consists in finding $\hat\f_{\Bx} =
+\argmax_{\f\in\Phi} L_{\Bx}(\f)$, or at least finding a local maximum
+--- there are certain well-known cases in which a finite mixture model
+likelihood is unbounded \citep{mclachlan2000fmm}, but we ignore these
+technical details for now. Calculating $\hat\f_{\Bx}$ even for a
+parametric finite mixture model is known to be a difficult problem, and
+considering $\Bx$ as incomplete data resulting from non-observed
+complete data helps.
+
+The associated complete data is denoted by $\Bc = (\vec c_1,\ldots, \vec
+c_n)$, with density $\Bh_\f(\Bc)=\prod_{i=1}^n h_\f(\vec c_i)$ (there
+exists a many-to-one mapping from $\Bc$ to $\Bx$, representing the loss
+of information).  In the model for complete data associated with
+model~\eqref{mvmixture}, each random vector $\vec C_i = (\vec X_i,\vec
+Z_i)$, where $\vec Z_i = (Z_{ij},j=1,\ldots m)$, and $Z_{ij}\in\{0,1\}$
+is a Bernoulli random variable indicating that individual $i$ comes from
+component $j$. Since each individual comes from exactly one component,
+this implies $\sum_{j=1}^m Z_{ij}=1$, and
+$$
+\Prob(Z_{ij} = 1) = \lambda_{j},\quad (\vec X_i|Z_{ij}=1) \sim \phi_j,
+\quad j=1,\ldots,m.
+$$
+The complete-data density for one observation is thus
+$$
+h_\f(\vec c_i) = h_\f(\vec x_i,\vec z_i) = \sum_{j=1}^m \I_{z_{ij}}\lb_j
+\phi_j (\vec x_i),
+$$
+In the parametric situation, i.e.\ when $\CF$ is a parametric family, it
+is easy to check that the complete-data MLE $\hat\f_{\Bc}$ based on
+maximizing $\log \Bh_\f(\Bc)$ is easy to find, provided that this is the
+case for the family $\CF$.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{EM algorithms}
+\label{sec:EM}
+
+An EM algorithm iteratively maximizes, instead of the observed
+log-likelihood $L_{\Bx}(\f)$, the operator
+$$
+Q(\f | \f^{(t)}) = \E \left[\log \Bh_\f(\BC)|\Bx,\f^{(t)} \right],
+$$
+where $\f^{(t)}$ is the current value at iteration~$t$, and the
+expectation is with respect to the distribution $\Bk_\f(\Bc|\Bx)$ of
+$\Bc$ given $\Bx$, for the value $\f^{(t)}$ of the parameter. The
+iteration $\f^{(t)} \to \f^{(t+1)}$ is defined in the above general
+setup by
+\begin{enumerate}
+\item E-step: compute $Q(\f | \f^{(t)})$
+
+\item M-step: set $\f^{(t+1)} = \argmax_{\f\in\Phi}Q(\f | \f^{(t)})$
+\end{enumerate}
+
+For finite mixture models, the E-step does not depend on the structure
+of $\CF$, since the missing data part is only related to the $\Bz$'s:
+$$
+\Bk_\f(\Bc|\Bx) = \prod_{i=1}^n k_\f(\vec z_i|\vec x_i).
+$$
+The $\Bz$ are discrete, and their distribution is given via Bayes'
+theorem. The M-step itself can be split in two parts, the maximization
+related to $\vec\lb$, which does not depend on $\CF$, and the
+maximization related to $\vec \phi$, which has to be handled
+specifically (say, parametrically, semi- or non-parametrically) for each
+model.  Hence the EM algorithms for the models handled by the
+\pkg{mixtools} package share the following common features:
+\begin{enumerate}
+\item{\bf E-step:\ } Calculate the ``posterior'' probabilities
+  (conditional on the data and $\vec\theta^{(t)}$) of component
+  inclusion,
+\begin{equation}\label{posteriors}
+  \post_{ij}^{(t)} \, \defn \,
+  \Prob_{\vec\theta^{(t)}}(Z_{ij}=1| \vec x_i)
+  = \frac{\lambda_j^{(t)} \phi_{j}^{(t)}(\vec x_{i})}
+  {\sum_{j'=1}^m\lambda_{j'}^{(t)} \phi_{j'}^{(t)}(\vec x_{i})}
+\end{equation}
+for all $i=1,\ldots, n$ and $j=1, \ldots, m$.  Numerically, it can be
+dangerous to implement equation (\ref{posteriors}) exactly as written
+due to the possibility of the indeterminant form $0/0$ in cases where
+$\vec x_i$ is so far from any of the components that all
+$\phi_{j'}^{(t)}(\vec x_i)$ values result in a numerical underflow to
+zero.  Thus, many of the routines in \pkg{mixtools} actually use the
+equivalent expression
+\begin{equation}\label{altposteriors}
+  \post_{ij}^{(t)}
+  = \left[ 1 +
+    \sum_{j'\ne j} \frac{ \lambda_{j'}^{(t)} \phi_{j'}^{(t)}(\vec x_{i})}
+    {\lambda_j^{(t)} \phi_{j}^{(t)}(\vec x_{i})} \right]^{-1}
+\end{equation}
+or some variant thereof.
+\item{\bf M-step for $\vec\lb$:\ } Set
+\begin{equation}\label{lambda}
+  \lambda_j^{(t+1)} = \frac1n\sum_{i=1}^n \post_{ij}^{(t)} ,
+  \quad\mbox{for $j=1, \ldots, m$.}
+\end{equation}
+\end{enumerate}
+
+
+\subsection{An EM algorithm example}
+\label{section:EMexample}
+
+As an example, we consider the univariate normal mixture analysis of the
+Old Faithful waiting data depicted in Figure \ref{geyser}. This fully
+parametric situation corresponds to a mixture from the univariate
+Gaussian family described in Section~\ref{s:intro}, where the $j$th
+component density $\phi_j(x)$ in \eqref{mvmixture} is normal with mean
+$\mu_j$ and variance $\sigma_j^2$.  This is a special case of the
+general mixture-of-normal model that is well-studied in the literature
+and for which other software, such as the \pkg{mclust}
+\citep{Fraley+Raftery:2009} package for \proglang{R}, may also be used
+for parameter estimation.  The M-step for the parameters
+$(\mu_j,\sigma^2_j)$, $j=1,\ldots,m$ of this EM algorithm for such
+mixtures of univariate normals is straightforward, and can be found,
+e.g., in \citet{mclachlan2000fmm}.  The function \code{normalmixEM}
+implements the algorithm in \pkg{mixtools}.  Code for the Old Faithful
+example, using most of the default values (e.g., stopping criterion,
+maximum number of iterations), is simply
+
+<<normmixEM>>=
+wait1 <- normalmixEM(waiting, lambda = .5, mu = c(55, 80), sigma = 5)
+@
+
+The code above will fit a 2-component mixture (because \code{mu} is a
+vector of length two) in which the standard deviations are assumed equal
+(because \code{sigma} is a scalar instead of a vector).  See
+\code{help("normalmixEM")} for details about specifying starting values
+for this EM algorithm.
+<<geyserEM, eval=FALSE>>=
+plot(wait1, density=TRUE, cex.axis=1.4, cex.lab=1.4, cex.main=1.8,
+     main2="Time between Old Faithful eruptions", xlab2="Minutes")
+@
+
+\setkeys{Gin}{width=0.49\textwidth}
+\begin{figure}[!h]
+  \centering
+<<geyserEM, echo=FALSE, results=tex>>=
+for(i in 1:2){
+  file=paste("geyserEM", i, ".pdf", sep="")
+  pdf(file=file, paper="special", width=6, height=6)
+  plot(wait1, whichplots=i, cex.axis = 1.4, cex.lab = 1.4, cex.main =
+       1.8,   main2 = "Time between Old Faithful eruptions", xlab2 =
+       "Minutes")
+  dev.off()
+  cat("\\includegraphics{", file, "}\n", sep="")
+}
+@
+\caption{The Old Faithful waiting data fitted with a parametric EM
+  algorithm in \pkg{mixtools}. Left: the sequence of log-likelihood
+  values; Right: the fitted Gaussian components.}
+\label{geyserEM}
+\end{figure}
+
+The \code{normalmixEM} function returns an object of class
+\code{"mixEM"}, and the \code{plot} method for these objects delivers
+the two plots given in Figure \ref{geyserEM}: the sequence $t\mapsto
+L_{\Bx}(\f^{(t)})$ of observed log-likelihood values and the histogram
+of the data with the $m$ ($m=2$ here) fitted Gaussian component
+densities of $\CN(\hat\mu_j,\hat\sigma^2_j)$, $j=1,\ldots,m$, each
+scaled by the corresponding $\hat\lambda_j$, superimposed.  The
+estimator $\hat{\vec\theta}$ can be displayed by typing, e.g.,
+<<geyserestimates>>=
+wait1[c("lambda", "mu", "sigma")]
+@
+
+Alternatively, the same output may be obtained using the \code{summary}
+method:
+<<geysersummary>>=
+summary(wait1)
+@
+
+\section{Cutpoint methods}
+\label{section:cut}
+
+Traditionally, most literature on finite mixture models has assumed that
+the density functions $\phi_j(\vec x)$ of equation (\ref{mvmixture})
+come from a known parametric family.  However, some authors have
+recently considered the problem in which $\phi_j(\vec x)$ is unspecified
+except for some conditions necessary to ensure the identifiability of
+the parameters in the model.  One such set of conditions is as follows:
+
+\citet{hettmansperger2000ani}; \citet{cruzmedina2004smm}; and
+\citet{elmore2004ecc} treat the case in which $\phi_j(\vec x)$ equals
+the product $f_j(x_i)\cdots f_j(x_r)$ for some univariate density
+function $f_j$.  Thus, conditional on knowing that $\vec X$ comes from
+the $j$th mixture component, the coordinates of $\vec X$ are independent
+and identically distributed.  For this reason, this case is called the
+conditionally i.i.d.\ model.
+
+The authors named above have developed an estimation method for the
+conditionally i.i.d.\ model.  This method, the {\em cutpoint approach},
+discretizes the continuous measurements by replacing each
+$r$-dimensional observation, say $\vec X_i= (x_{i1}, \ldots, x_{ir})$,
+by the $p$-dimensional multinomial vector $(n_1, \ldots, n_p)$, where
+$p\ge2$ is chosen by the experimenter along with a set of cutpoints
+$-\infty = c_0 < c_1 < \cdots < c_p=\infty$, so that for $a=1, \ldots,
+p$,
+\[
+n_a = \sum_{k=1}^r I\{c_{a-1} < x_{ik} \le c_a\}.
+\]
+Note that the multinomial distribution is guaranteed by the conditional
+i.i.d.\ assumption, and the multinomial probability of the $a$th
+category is equal to $\theta_a \equiv P_{}(c_{a-1}<X_{ik}\le c_a)$.
+
+The cutpoint approach is completely general in the sense that it can be
+applied to any number of components $m$ and any number of repeated
+measures $r$, just as long as $r \ge 2m-1$, a condition that guarantees
+identifiability \citep{elmore2003}.  However, some information is lost
+in the discretization step, and for this reason it becomes difficult to
+obtain density estimates of the component densities.  Furthermore, even
+if the assumption of conditional independence is warranted, the extra
+assumption of identically distributed coordinates may not be; and the
+cutpoint method collapses when the coordinates are not identically
+distributed.
+
+As an illustration of the cutpoint approach applied to a dataset, we
+show here how to use \pkg{mixtools} to reconstruct---almost---an example
+from \citet{elmore2004ecc}.  The dataset is \code{Waterdata}, a
+description of which is available by typing \code{help("Waterdata")}.
+This dataset contains 8 observations on each of 405 subjects, where the
+observations are angle degree measurements ranging from $-90$ to $90$
+that describe the subjects' answers to a series of 8 questions related
+to a conceptual task about how the surface of a liquid would be oriented
+if the vessel containing it were tipped to a particular angle.  The
+correct answer is 0 degree in all cases, yet the subjects showed a
+remarkable variety of patterns of answers.  \citet{elmore2004ecc}
+assumed the conditionally i.i.d.\ model (see \citet{benaglia2009} for an
+in-depth discussion of this assumption and this dataset) with both $m=3$
+and $m=4$ mixture components.  \citet{elmore2004ecc} summarized their
+results by providing plots of estimated empirical distribution functions
+for the component distributions, where these functions are given by
+\begin{equation}\label{ecdf}
+  \tilde F_j(x) = \frac{1}{mn\lambda_j}\sum_{i=1}^n \sum_{\ell=1}^r
+  p_{ij}I\{x_{i\ell}\le x\}.
+\end{equation}
+In equation (\ref{ecdf}), the values of $\lambda_j$ and $p_{ij}$ are the
+final maximum likelihood estimates of the mixing proportions and
+posterior component membership probabilities that result from fitting a
+mixture of $m$ multinomials (note in particular that the estimates of
+the multinomial parameters $\theta_a$ for each component are not used in
+this equation).
+
+We cannot obtain the exact results of \citet{elmore2004ecc} because
+those authors do not state specifically which cutpoints $c_a$ they use;
+they merely state that they use thirteen cutpoints.  It appears from
+their Figures 1 and 2 that these cutpoints occur approximately at
+intervals of 10.5 degrees, starting at $-63$ and going through $63$;
+these are the cutpoints that we adopt here.  The function
+\code{makemultdata} will create a multinomial dataset from the original
+data, as follows:
+<<cutpoint>>=
+data("Waterdata")
+cutpts <- 10.5*(-6:6)
+watermult <- makemultdata(Waterdata, cuts = cutpts)
+@
+
+Once the multinomial data have been created, we may apply the
+\code{multmixEM} function to estimate the multinomial parameters via an
+EM algorithm.
+<<multmixEM>>=
+set.seed(15)
+theta4 <- matrix(runif(56), ncol = 14)
+theta3 <- theta4[1:3,]
+mult3 <- multmixEM(watermult, lambda = rep(1, 3)/3, theta = theta3)
+mult4 <- multmixEM (watermult, lambda = rep (1, 4) / 4, theta = theta4)
+@
+
+Finally, \code{compCDF} calculates and plots the estimated distribution
+functions of equation (\ref{ecdf}).  Figure \ref{WDcutpoint} gives plots
+for both a 3-component and a 4-component solution; these plots are very
+similar to the corresponding plots in Figures 1 and 2 of
+\citet{elmore2004ecc}.
+<<echo=TRUE, eval=FALSE>>=
+cdf3 <- compCDF(Waterdata, mult3$posterior, lwd=2, lab=c(7, 5, 7),
+                xlab="Angle in degrees", ylab="Component CDFs",
+                main="Three-Component Solution")
+cdf4 <- compCDF(Waterdata, mult4$posterior, lwd=2, lab=c(7, 5, 7),
+                xlab="Angle in degrees", ylab="Component CDFs",
+                main="Four-Component Solution")
+@
+
+<<cutpointplots, results=hide, echo=FALSE>>=
+pdf(file="WDcutpoint3comp.pdf", paper="special", width=8, height=8)
+cdf3 <- compCDF(Waterdata, mult3$posterior, lwd=3,
+                xlab="Angle in degrees", lab=c(7, 5, 7), ylab="Component CDFs",
+                main="Three-Component Solution", cex.axis=1.4, cex.lab=1.5,
+                cex.main=1.5)
+ltext <- paste(round(mult3$lam*100, 1), "%", sep="")
+legend("bottomright", legend=ltext, pch=15:17, cex=1.5, pt.cex=1.35)
+y <- compCDF(Waterdata, mult3$posterior, x=cutpts, makeplot=F)
+for(i in 1:3) points(cutpts, y[i,], pch=14+i, cex=1.35)
+dev.off()
+pdf(file="WDcutpoint4comp.pdf", paper="special", width=8, height=8)
+cdf4 <- compCDF(Waterdata, mult4$posterior, lwd=3,
+                xlab="Angle in degrees", lab=c(7, 5, 7),
+                ylab="Component CDFs", main="Four-Component Solution",
+                cex.axis=1.4, cex.lab=1.5, cex.main=1.5)
+ltext <- paste(round(mult4$lam*100,1), "%", sep="")
+legend("bottomright", legend=ltext, pch=15:18, cex=1.5, pt.cex=1.35)
+y <- compCDF(Waterdata, mult4$posterior, x=cutpts, makeplot=F)
+for(i in 1:4) points(cutpts, y[i,], pch=14+i, cex=1.35)
+dev.off()
+@
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.49\textwidth]{WDcutpoint3comp}
+  \includegraphics[width=0.49\textwidth]{WDcutpoint4comp}
+  \caption{Empirical cumulative distribution function (CDF) estimates
+    for the three- and four-component multinomial cutpoint models for
+    the water-level data; compare Figures 1 and 2 of
+    \citet{elmore2004ecc}.  The 13 cutpoints used are indicated by the
+    points in the plots, and the estimated mixing proportions for the
+    various components are given by the legend.  }
+  \label{WDcutpoint}
+\end{figure}
+
+As with the output of \code{normalmixEM} in Section~\ref{section:EM},
+it is possible to summarize the output of the \code{multmixEM} function using
+the \code{summary} method for \code{mixEM} objects:
+<<summarymult4>>=
+summary(mult4)
+@
+
+
+\section{Nonparametric and semiparametric methods}
+\label{section:np}
+
+In this section, we consider nonparametric multivariate finite mixture
+models.  The first algorithm presented here was introduced by
+\citet{benaglia2009} as a generalization of the stochastic
+semiparametric EM algorithm of \citet{bordes2007sas}. Both algorithms
+are implemented in \pkg{mixtools}.
+
+\subsection{EM-like algorithms for mixtures of unspecified densities}
+\label{section:EMlike}
+
+Consider the mixture model described by equation \eqref{mvmixture}. If
+we assume that the coordinates of the $\vec X_i$ vector are {\em
+  conditionally independent}, i.e. they are independent conditional on
+the subpopulation or component ($\phi_1$ through $\phi_m$) from which
+$\vec X_i$ is drawn, the density in \eqref{mvmixture} can be rewritten
+as:
+\begin{equation}
+  \label{mvmixture2}
+  g_{\vec\theta}(\vec x_i) =
+  \sum_{j=1}^m\lambda_j\prod_{k=1}^rf_{jk}(x_{ik}),
+\end{equation}
+where the function $f(\cdot)$, with or without subscripts, will always
+denote a univariate density function. Here we do not assume that
+$f_{jk}(\cdot)$ comes from a family of densities that may be indexed by
+a finite-dimensional parameter vector, and we estimate these densities
+using nonparametric density techniques. That is why we say that this
+algorithm is a fully nonparametric approach.
+
+The density in equation \eqref{mvmixture2} allows for a different
+distribution for each component and each coordinate of $\vec
+X_i$. Notice that if the density $f_{jk}(\cdot)$ does not depend on $k$,
+we have the case in which the $\vec X_i$ are not only conditionally
+independent but identically distributed as well. These are the two
+extreme cases. In order to encompass both the conditionally i.i.d. case
+and the more general case \eqref{mvmixture2} simultaneously in one
+model, we allow that the coordinates of $\vec X_i$ are conditionally
+independent and there exist {\em blocks} of coordinates that are also
+identically distributed. If we let $b_k$ denote the block to which the
+$k$th coordinate belongs, where $1\le b_k\le B$ and $B$ is the total
+number of such blocks, then equation \eqref{mvmixture2} is replaced by
+\begin{equation}\label{rmgeneral}
+  g_{\vec\theta} (\vec x_i) = \sum_{j=1}^m \lambda_j \prod_{k=1}^r
+  f_{j{b_k}} (x_{ik}).
+\end{equation}
+
+The indices $i$, $j$, $k$, and $\ell$ will always denote a generic
+individual, component (subpopulation), coordinate (repeated
+measurement), and block, respectively. Therefore, we will always have
+$1\le i\le n$, $1\le j\le m$, $1\le k\le r$, and $1\le\ell\le B$.
+
+The EM algorithm to estimate model \eqref{rmgeneral} has the E-step and
+M-step described in Section~\ref{sec:EM}.  In equation
+(\ref{posteriors}), we have $\phi_j^{(t)}(\vec x_i) = \prod_{k=1}^r
+f_{jb_k}^{(t)}(x_{ik})$, where $f_{j\ell}^{(t)}(\cdot)$ is obtained by a
+weighted nonparametric (kernel) density estimate, given by:
+\begin{enumerate}
+  \addtocounter{enumi}{2}
+\item{\bf Nonparametric (Kernel) density estimation step:\ } For any
+  real $u$, define for each component $j\in\{1, \ldots, m\}$ and each
+  block $\ell\in\{1, \ldots, B\}$
+  \begin{equation}
+    \label{densest}
+    f_{j\ell}^{t+1}(u) = \frac
+    {1}{nh_{j\ell} C_\ell\lambda_{j}^{t+1}} \sum_{k=1}^r \sum_{i=1}^n
+    \post_{ij}^{(t)} I\{b_k=\ell\}
+    K\left(\frac{u-x_{ik}}{h_{j\ell}}\right),
+  \end{equation}
+  where $K(\cdot)$ is a kernel density function, $h_{j\ell}$ is the
+  bandwidth for the $j$th component and $\ell$th block density estimate,
+  and $C_\ell$ is the number of coordinates in the $\ell$th block.
+\end{enumerate}
+
+The function \code{npEM} implements this algorithm in
+\pkg{mixtools}. This function has an argument \code{samebw} which, when
+set to \code{TRUE} (the default), takes $h_{j\ell} = h$, for all $1 \le
+j \le m$ and $1\le\ell\le B$, that is, the same bandwidth for all
+components and blocks, while \code{samebw = FALSE} allows a different
+bandwidth for each component and each block, as detailed in
+\citet{bch:festchrift2009}.  This function will, if called using
+\code{stochastic = TRUE}, replace the deterministic density estimation
+step (\ref{densest}) by a {\em stochastic} density estimation step of
+the type proposed by \citet{bordes2007sas}: First, generate $\vec
+Z^{(t)}_{i} = (Z^{(t)}_{i1}, \ldots, Z^{(t)}_{im})$ as a multivariate
+random vector with a single trial and success probability vector $\vec
+p_i^{(t)} = (p_{i1}^{(t)}, \ldots, p_{1m}^{(t)})$, then in the M-step
+for $\lambda_{j}^{t+1}$ in equation~(\ref{lambda}), replace
+$p^{(t)}_{ij}$ by $Z^{(t)}_{ij}$ and let
+\[
+f_{j\ell}^{t+1}(u) = \frac {1}{nh_{j\ell} C_\ell\lambda_{j}^{t+1}}
+\sum_{k=1}^r \sum_{i=1}^n Z_{ij}^{(t)} I\{b_k=\ell\}
+K\left(\frac{u-x_{ik}}{h_{j\ell}}\right).
+\]
+In other words, the stochastic versions of these algorithms re-assign
+each observation randomly at each iteration, according to the
+$p_{ij}^{(t)}$ values at that iteration, to one of the $m$ components,
+then the density estimate for each component is based only on those
+observations that have been assigned to it.  Because the stochastic
+algorithms do not converge the way a deterministic algorithm often does,
+the output of \code{npEM} is slightly different when \code{stochastic =
+  TRUE} than when \code{stochastic = FALSE}, the default.  See the
+corresponding help file for details.
+
+\citet{benaglia2009} also discuss specific cases of model
+(\ref{rmgeneral}) in which some of the $f_{jb_k}(\cdot)$ densities are
+assumed to be the same except for a location and scale change.  They
+refer to such cases as semiparametric since estimating each
+$f_{jb_k}(\cdot)$ involves estimating an unknown density as well as
+multiple location and scale parameters.  For instance, equation (17) of
+\citet{benaglia2009} sets
+\begin{equation}
+  \label{spEM}
+  f_{j\ell}(x) = \frac{1}{\sigma_{j\ell}}f
+  \left( \frac{x-\mu_{j\ell}}{\sigma_{j\ell}} \right),
+\end{equation}
+where $\ell=b_k$ for a generic $k$.
+
+The \pkg{mixtools} package implements an algorithm for fitting model
+(\ref{spEM}) in a function called \code{spEM}.  Details on the use of
+this function may be obtained by typing \code{help("spEM")}.
+Implementation of this algorithm and of that of the \code{npEM} function
+requires updating the values of $f_{jb_k}(x_{ik})$ for all $i$, $j$, and
+$k$ for use in the E-step (\ref{posteriors}).  To do this, the
+\code{spEM} algorithm keeps track of an $n\times m$ matrix, called
+$\Phi$ here, where
+\[
+\Phi_{ij} \equiv \phi_j(\vec x_i) = \prod_{k=1}^r f_{jb_k}(x_{ik}).
+\]
+The density estimation step of equation (\ref{densest}) updates the
+$\Phi$ matrix for the $(t+1)$th iteration based on the most recent
+values of all of the parameters.  For instance, in the case of model
+(\ref{spEM}), we obtain
+\begin{eqnarray*}
+  \Phi_{ij}^{t+1}
+  &=& \prod_{\ell=1}^B\prod_{k:b_k=\ell} \frac{1}{\sigma_{j\ell}^{t+1}}
+  f^{t+1}
+  \left( \frac{x-\mu_{j\ell}^{t+1}}{\sigma_{j\ell}^{t+1}} \right) \\
+  &=& \prod_{\ell=1}^B
+  \prod_{k:b_k=\ell} \frac{1}{\sigma_{j\ell}^{t+1}} \sum_{i'=1}^n
+  \frac{p_{ij}^{t+1}}{hrn\lambda_j^{t+1}}
+  \sum_{k'=1}^r
+  K\left[
+    \frac{\left(\frac{x_{ik}-\mu_{j\ell}^{t+1}}{\sigma_{j\ell}^{t+1}} \right) - (x_{i'k'} -
+      \mu_{j\ell}^{t+1})}
+    {h\sigma_{j\ell}^{t+1}}
+  \right].
+\end{eqnarray*}
+
+\subsection{A univariate symmetric, location-shifted semiparametric
+  example}
+\label{section:SPexample}
+
+Both \citet{hunter2007ims} and \citet{bordes2006set} study a particular
+case of model ({\ref{mvmixture}) in which $x$ is univariate and
+\begin{equation}
+  \label{spmodel}
+  g_{\vec \theta}(x) = \sum_{j=1}^m\lambda_j \phi(x-\mu_j),
+\end{equation}
+where $\phi(\cdot)$ is a density that is assumed to be completely
+unspecified except that it is symmetric about zero.  Because each
+component distribution has both a nonparametric part $\phi(\cdot)$ and a
+parametric part $\mu_j$, we refer to this model as semiparametric.
+
+Under the additional assumption that $\phi(\cdot)$ is absolutely
+continuous with respect to Lebesgue measure, \citet{bordes2007sas}
+propose a stochastic algorithm for estimating the model parameters,
+namely, $(\vec\lambda, \vec\mu, \phi)$.  This algorithm is implemented
+by the \pkg{mixtools} function \code{spEMsymloc}.  This function also
+implements a nonstochastic version of the algorithm, which is the
+default and which is a special case of the general algorithm described
+in Section~\ref{section:EMlike}.
+
+<<spsymmplots, results=hide, echo=FALSE>>=
+pdf(file="spsymmfig1.pdf", paper="special", width=8, height=8)
+par(mar=0.1+c(5,4.2,4,1.8))
+plot(wait1, which = 2, cex.axis = 1.4, cex.lab = 1.5, cex.main = 1.5,
+     main2 = "Time between Old Faithful eruptions", xlab2 = "Minutes")
+wait2 <- spEMsymloc(waiting, mu0 = c(55, 80))
+plot(wait2, lty = 2, newplot = FALSE, addlegend = FALSE)
+dev.off()
+pdf(file="spsymmfig2.pdf", paper="special", width=8, height=8)
+par(mar=0.1+c(5,4.2,4,1.8))
+wait2a <- spEMsymloc(waiting, mu0 = c(55, 80), bw = 1)
+wait2b <- spEMsymloc(waiting, mu0 = c(55, 80), bw = 6)
+plot(wait2a, lty = 1, addlegend = FALSE, cex.axis = 1.4, cex.lab = 1.5,
+     cex.main = 1.5, title = "Time between Old Faithful eruptions",
+     xlab = "Minutes")
+plot(wait2b, lty = 2, newplot = FALSE, addlegend = FALSE)
+dev.off()
+@
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[height=3in,width=3in]{spsymmfig1}
+  \includegraphics[height=3in,width=3in]{spsymmfig2}
+  \caption{The Old Faithful dataset, fit using different algorithms in
+    \pkg{mixtools}. Left: the fitted Gaussian components (solid) and a
+    semiparametric fit assuming model (\ref{spmodel}) with the default
+    bandwidth of $4.0$ (dashed); Right: the same model (\ref{spmodel})
+    using bandwidths of $1.0$ (solid) and $6.0$ (dashed).}
+  \label{spsymmfig}
+\end{figure}
+
+As noted in Figure \ref{geyser}, model (\ref{spmodel}) appears to be an
+appropriate model for the Old Faithful waiting times dataset.  Here, we
+provide code that applies the \code{spEMsymloc} function to these data.
+First, we display the normal mixture solution of Figure \ref{geyserEM}
+with a semiparametric solution superimposed, in Figure
+\ref{spsymmfig}(a):
+<<plotspsymm, eval=FALSE>>=
+plot(wait1, which = 2, cex.axis = 1.4, cex.lab = 1.4, cex.main = 1.8,
+     main2 = "Time between Old Faithful eruptions", xlab2 = "Minutes")
+wait2 <- spEMsymloc(waiting, mu0 = c(55, 80))
+plot(wait2, lty = 2, newplot = FALSE, addlegend = FALSE)
+@
+
+Because the semiparametric version relies on a kernel density estimation
+step (\ref{densest}), it is necessary to select a bandwidth for this
+step.  By default, \code{spEMsymloc} uses a fairly simplistic approach:
+It applies ``Silverman's rule of thumb'' \citep{silverman1986des} to the
+entire dataset using the \code{bw.nrd0} function in \proglang{R}.  For
+the Old Faithful waiting time dataset, this bandwidth is about~$4$:
+<<bandwidth>>=
+bw.nrd0(waiting)
+@
+
+But the choice of bandwidth can make a big difference, as seen in Figure
+\ref{spsymmfig}(b).
+<<plotbweffect, eval=FALSE>>=
+wait2a <- spEMsymloc(waiting, mu0 = c(55, 80), bw = 1)
+wait2b <- spEMsymloc(waiting, mu0 = c(55, 80), bw = 6)
+plot(wait2a, lty = 1, addlegend = FALSE, cex.axis = 1.4,
+     cex.lab = 1.4, cex.main = 1.8, xlab = "Minutes",
+     title = "Time between Old Faithful eruptions")
+plot(wait2b, lty = 2, newplot = FALSE, addlegend = FALSE)
+@
+
+We find that with a bandwidth near $2$, the semiparametric solution
+looks quite close to the normal mixture solution of Figure
+\ref{geyserEM}.  Reducing the bandwidth further results in the
+``bumpiness'' exhibited by the solid line in Figure \ref{spsymmfig}(b).
+On the other hand, with a bandwidth of 8, the semiparametric solution
+completely breaks down in the sense that algorithm tries to make each
+component look similar to the whole mixture distribution.  We encourage
+the reader to experiment by changing the bandwidth in the above code.
+
+\subsection{A trivariate Gaussian example}
+\label{ss:trigauss}
+
+As a first simple, nonparametric example, we simulate a Gaussian
+trivariate mixture with independent repeated measures and a shift of
+location between the two components in each coordinate, i.e., $m=2$,
+$r=3$, and $b_k=k$, $k=1,2,3$.  The individual densities $f_{jk}$ are
+the densities of $\CN(\mu_{jk},1)$, with component means $\vec\mu_1 =
+(0,0,0)$ and $\vec\mu_2=(3,4,5)$. This example was introduced by
+\citet{hall2005nim} then later reused by \citet{benaglia2009} for
+comparison purposes.  Note that the parameters in this model are
+identifiable, since \citet{hall2003nec} showed that for two components
+($m=2$), identifiability holds in model~\eqref{mvmixture} is under mild
+assumptions as long as $r\ge3$, even in the most general case in which
+$b_k=k$ for all $k$.
+
+A function \code{ise.npEM} has been included in \pkg{mixtools} for
+numerically computing the integrated squared error (ISE) relative to a
+user-specified true density for a selected estimated density $\hat
+f_{jk}$ from \code{npEM} output.  Each density $\hat f_{jk}$ is computed
+using equation~(\ref{densest}) together with the posterior probabilities
+after convergence of the algorithm, i.e., the final values of the
+$\post_{ij}^t$ (when \code{stochastic = FALSE}).  We illustrate the
+usage of \code{ise.npEM} in this example by running a Monte Carlo
+simulation for $S$ replications, then computing the square root of the
+mean integrated squared error (MISE) for each density, where
+\[ {\rm MISE} = \frac{1}{S}\sum_{s=1}^S \int \left(\hat
+  f_{jk}^{(s)}(u)-f_{jk}(u)\right)^2\,du,\quad j=1,2 \mbox{ and }
+k=1,2,3.
+\]
+
+For this example, we first set up the model true parameters with $S=100$
+replications of $n=300$ observations each:
+<<gaussexample>>=
+m <- 2; r <- 3; n <- 300; S <- 100
+lambda <- c(0.4, 0.6)
+mu <- matrix(c(0, 0, 0, 3, 4, 5), m, r, byrow = TRUE)
+sigma <- matrix(rep(1, 6), m, r, byrow = TRUE)
+@
+
+Next, we set up ``arbitrary'' initial centers, a matrix for storing sums
+of integrated squared errors, and an integer storing the number of
+suspected instances of label switching that may occur during the
+replications:
+<<gaussinitial>>=
+centers <- matrix(c(0, 0, 0, 4, 4, 4), 2, 3, byrow = TRUE)
+ISE <- matrix(0, m, r, dimnames = list(Components = 1:m, Blocks = 1:r))
+nblabsw <- 0
+@
+Finally, we run the Monte Carlo simulation, using the \code{samebw =
+  FALSE} option since it is more appropriate for this location-shift
+model:
+<<sqMISE>>=
+set.seed(1000)
+for (mc in 1:S) {
+  x <- rmvnormmix(n, lambda, mu, sigma)
+  a <- npEM(x, centers, verb = FALSE, samebw = FALSE)
+  if (a$lambda[1] > a$lambda[2]) nblabsw <- nblabsw + 1
+  for (j in 1:m) {
+     for (k in 1:r) {
+     ISE[j, k] <- ISE[j, k] + ise.npEM(a, j, k, dnorm,
+         lower = mu[j, k] - 5, upper = mu[j, k] + 5, plots = FALSE,
+         mean = mu[j, k], sd = sigma[j, k])$value #$
+    }
+  }
+}
+MISE <- ISE/S
+print(sqMISE <- sqrt(MISE))
+@
+
+We can examine the \code{npEM} output from the last replication above
+using
+<<summarygauss>>=
+summary(a)
+@
+
+We can also get plots of the estimated component densities for each
+block (recall that in this example, block $\ell$ consists only of
+coordinate $\ell$) using the \code{plot} function. The resulting plots
+are given in Figure~\ref{fig:gausstrivariate}.
+<<plotgauss3rm, eval=FALSE>>=
+plot(a)
+@
+
+<<gauss3rm, echo=FALSE, results=hide>>=
+pdf("gauss3rm.pdf", paper="special", width=10, height=5)
+par(mfrow=c(1,3), ask=F)
+plot(a)
+dev.off()
+@
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.99\textwidth]{gauss3rm}
+  \caption{Output of the \code{npEM} algorithm for the trivariate
+    Gaussian model with independent repeated measures.}
+  \label{fig:gausstrivariate}
+\end{figure}
+
+
+\subsection{A more general multivariate nonparametric example}
+\label{sec:generalmv}
+
+In this section, we fit a more difficult example, with non-multimodal
+mixture densities (in block \#2), heavy-tailed distributions, and
+different scales among the coordinates. The model is multivariate with
+$r=5$ repeated measures and $m=2$ components (hence identifiability
+holds; cf.\ \citet{hall2003nec} as cited in
+Section~\ref{ss:trigauss}). The $5$ repeated measures are grouped into
+$B=2$ blocks, with $b_1=b_2=b_3=1$ and $b_4=b_5=2$.  Block $1$
+corresponds to a mixture of two noncentral Student $t$ distributions,
+$t'(2,0)$ and $t'(10,8)$, where the first parameter is the number of
+degrees of freedom, and the second is the non-centrality. Block~2
+corresponds to a mixture of Beta distributions, ${\cal B}(1,1)$ (which
+is actually the uniform distribution over $[0,1]$) and ${\cal
+  B}(1,5)$. The first component weight is $\lambda_1 = 0.4$. The true
+mixtures are depicted in Figure~\ref{fig:true5rm}.
+
+<<true5rm, echo=FALSE, results=hide>>=
+pdf("truepdf5rm_block1.pdf")
+par(mar=0.1+c(5,4.2,4,1.5))
+x <- seq(-10, 25, len=250)
+plot(x, .4* dt(x, 2, 0) + .6 * dt(x, 10, 8), type="l", lwd=3, col=2,
+     cex.axis=1.4, cex.lab=1.5, cex.main=1.5, main="Block 1", xlab="",
+     ylab="Density")
+lines (x, .4*dt(x, 2, 0), lwd=4, lty=2)
+lines (x, .6*dt(x, 10, 8), lwd=4, lty=2)
+dev.off()
+pdf("truepdf5rm_block2.pdf")
+par(mar=0.1+c(5,4.2,4,1.5))
+x <- seq(0, 1, len=250)
+plot(x, .4 + .6 * dbeta(x, 1, 5), type="l", lwd=3, col=2, cex.axis=1.4,
+   cex.lab=1.5, cex.main=1.5, main="Block 2", xlab="", ylab="Density",
+   ylim= c(0, 3.4))
+lines (x, rep(.4, 250), lwd=4, lty=2)
+lines (x, .6*dbeta(x, 1, 5), lwd=4, lty=2)
+dev.off()
+@
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[height=2.5in,width=2.5in]{truepdf5rm_block1}
+  \includegraphics[height=2.5in,width=2.5in]{truepdf5rm_block2}
+  \caption{True densities for the mixture of
+    Section~\ref{sec:generalmv}, with individual component densities
+    (scaled by $\lambda_j$) in dotted lines and mixture densities in
+    solid lines.  The noncentral $t$ mixture of coordinates 1 through 3
+    is on the left, the beta mixture of coordinates 4 and 5 on the
+    right.}
+  \label{fig:true5rm}
+\end{figure}
+
+
+To fit this model in \pkg{mixtools}, we first set up the model
+parameters:
+<<parameters5rm>>=
+m <- 2; r <- 5
+lambda <- c(0.4, 0.6)
+df <- c(2, 10); ncp <- c(0, 8)
+sh1 <- c(1, 1) ; sh2 <- c(1, 5)
+@
+
+Then we generate a pseudo-random sample of size $n=300$ from this model:
+<<generate5rm>>=
+n <- 300; z <- sample(m, n, rep = TRUE, prob = lambda)
+r1 <- 3; z2 <- rep(z, r1)
+x1 <- matrix(rt(n * r1, df[z2], ncp[z2]), n, r1)
+r2 <- 2; z2 <- rep(z, r2)
+x2 <- matrix(rbeta(n * r2, sh1[z2], sh2[z2]), n, r2)
+x <- cbind(x1, x2)
+@
+
+For this example in which the coordinate densities are on different
+scales, it is obvious that the bandwidth in \code{npEM} should depend on
+the blocks and components.  We set up the block structure and some
+initial centers, then run the algorithm with the option \code{samebw =
+  FALSE}:
+<<npEM5rm>>=
+id <- c(rep(1, r1), rep(2, r2))
+centers <- matrix(c(0, 0, 0, 1/2, 1/2, 4, 4, 4, 1/2, 1/2), m, r,
+                  byrow = TRUE)
+b <- npEM(x, centers, id, eps = 1e-8, verb = FALSE, samebw = FALSE)
+@
+Figure~\ref{fig:npEM5rm} shows the resulting density estimates, which
+may be obtained using the plotting function included in \pkg{mixtools}:
+
+<<plot5rm, eval=FALSE>>=
+plot(b, breaks = 15)
+@
+
+% plot(b, breaks = 15, cex.main = 1.5, cex.lab = 1.5, cex.axis = 1.4,
+%     cex.legend = 1.5)
+
+<<plot5rmcommands, echo=FALSE, results=hide>>=
+pdf("npEM5rm.pdf", width=8, height=5)
+par(mfrow=c(1,2))
+plot(b, breaks = 15)
+
+dev.off()
+@
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.95\textwidth]{npEM5rm}
+  \caption{Result of plotting \code{npEM} output for the example of
+    Section~\ref{sec:generalmv}.  Since $n=300$, the histogram on the
+    left includes 900 observations and the one on the right includes
+    600.}
+  \label{fig:npEM5rm}
+\end{figure}
+
+Finally, we can compute the ISE of the estimated density relative to the
+truth for each block and component. The corresponding output is depicted
+in Figure \ref{fig:ISEnpEM5rm}.
+<<ISEnpEM5rm, eval=FALSE>>=
+par(mfrow=c(2,2))
+for (j in 1:2){
+  ise.npEM(b, j, 1, truepdf = dt, lower = ncp[j] - 10,
+           upper = ncp[j] + 10, df = df[j], ncp = ncp[j])
+  ise.npEM(b, j, 2, truepdf = dbeta, lower = -0.5,
+           upper = 1.5,  shape1 = sh1[j], shape2 = sh2[j])
+}
+@ 
+
+<<plotISEnpEM5rm, echo=FALSE, results=hide>>=
+options(warn=-1)
+pdf("ISEnpEM5rm.pdf", width=8, height=8)
+par(mfrow = c(2, 2))
+for (j in 1:2){
+  ise.npEM(b, j, 1, truepdf = dt, lower = ncp[j] - 10,
+           upper = ncp[j] + 10, df = df[j], ncp = ncp[j])
+  ise.npEM(b, j, 2, truepdf = dbeta, lower = -0.5,
+           upper = 1.5,  shape1 = sh1[j], shape2 = sh2[j])
+}
+dev.off()
+@
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[height=5in,width=6in]{ISEnpEM5rm}
+  \caption{\code{ise.npEM} output for the 5-repeated measures example;
+    the true densities are $f_{11}\equiv t'(2,0)$, $f_{21}\equiv
+    t'(10,8)$, $f_{12}\equiv {\cal U}_{(0,1)}$, $f_{22}\equiv {\cal
+      B}(1,5)$.}
+  \label{fig:ISEnpEM5rm}
+\end{figure}
+
+\section{Mixtures of regressions}
+\label{section:reg}
+
+\subsection{Mixtures of linear regressions}
+
+Consider a mixture setting where we now assume $\textbf{X}_{i}$ is a
+vector of covariates observed with a response $Y_{i}$.  The goal of
+mixtures of regressions is to describe the conditional distribution of
+$Y_{i}|\textbf{X}_{i}$. Mixtures of regressions have been extensively
+studied in the econometrics literature and were first introduced by
+\citet{quandt1972sr} as the \textit{switching regimes} (or
+\textit{switching regressions}) problem. A switching regimes system is
+often compared to \textit{structural change} in a system
+\citep{quandtram1978sr}. A structural change assumes the system depends
+deterministically on some observable variables, but switching regimes
+implies one is unaware of what causes the switch between regimes. In the
+case where it is assumed there are two heterogeneous classes,
+\citet{quandt1972sr} characterized the switching regimes problem ``by
+assuming that nature chooses between regimes with probabilities
+$\lambda$ and $1-\lambda$''.
+
+Suppose we have $n$ independent univariate observations,
+$y_{1},\ldots,y_{n}$, each with a corresponding vector of predictors,
+$\textbf{x}_{1},\ldots,\textbf{x}_{n}$, with
+$\textbf{x}_{i}=(x_{i,1},\ldots,x_{i,p})^\top$ for $i=1,\ldots,n$. We
+often set $x_{i,1}=1$ to allow for an intercept term. Let
+$\textbf{y}=(y_{1},\ldots,y_{n})^\top$ and let $\underline{\textbf{X}}$
+be the $n\times p$ matrix consisting of the predictor vectors.
+
+Suppose further that each observation $(y_{i}, \vec x_i)$ belongs to one
+of $m$ classes. Conditional on membership in the $j$th component, the
+relationship between $y_{i}$ and $\textbf{x}_{i}$ is the normal
+regression model
+\begin{equation}\label{regmodel}
+  y_{i}=\textbf{x}_{i}^\top\vec{\beta}_{j}+\epsilon_{i},
+\end{equation}
+where $\epsilon_{i}\thicksim \CN(0,\sigma^{2}_{j})$ and
+$\vec{\beta}_{j}$ and $\sigma_{j}^{2}$ are the $p$-dimensional vector of
+regression coefficients and the error variance for component $j$,
+respectively.
+
+Accounting for the mixture structure, the conditional density of
+$y_{i}|\vec x_i$ is
+\begin{equation}\label{mor}
+  g_{\vec\theta}(y_{i}|\textbf{x}_{i})=\sum_{j=1}^{m}\lambda_{j}
+  \phi(y_{i} | \textbf{x}_{i}^\top\vec{\beta}_{j},\sigma^{2}_{j}),
+\end{equation}
+where $\phi(\cdot|\textbf{x}^\top\vec{\beta}_{j},\sigma^{2}_{j})$ is the
+normal density with mean $\textbf{x}^\top\vec\beta$ and variance
+$\sigma^2$.  Notice that the model parameter for this setting is
+$\vec\theta=(\vec\lambda,(\vec{\beta}_{1},\sigma^2_{1}),\ldots,(\vec{\beta}_{m},\sigma^2_{m}))$.
+The mixture of regressions model (\ref{mor}) differs from the well-known
+mixture of multivariate normals model
+$(Y_{i},\textbf{X}_{i}^\top)^\top\thicksim
+\sum_{j=1}^{m}\lambda_{j}\CN_{p+1}(\vec{\mu}_{j},\Sigma_{j})$ because
+model (\ref{mor}) makes no assertion about the marginal distribution of
+$\textbf{X}_{i}$, whereas the mixture of multivariate normals specifies
+that $\textbf{X}_{i}$ itself has a mixture of multivariate normals
+distribution.
+
+<<gnpdata, echo=FALSE, results=hide>>=
+data("CO2data")
+attach(CO2data)
+pdf("gnpdata.pdf")
+par(mar=0.1+c(5,4.2,4,1.5))
+plot(GNP, CO2, xlab="Gross National Product",
+     ylab=expression(paste(CO[2]," per Capita")),
+     cex.lab=1.5, cex.main=1.5, cex.axis=1.4,
+     main="1996 GNP and Emissions Data")
+text(GNP, CO2, country, adj=c(.5,-.5))
+dev.off()
+@
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[height=3in,width=3in]{gnpdata.pdf}
+  \caption{1996 data on gross national product (GNP) per capita and
+    estimated carbon dioxide ($\textrm{CO}_{2}$) emissions per capita.
+    Note that ``CH'' stands for Switzerland, not China.}
+  \label{gnpdata}
+\end{figure}
+
+As a simple example of a dataset to which a mixture of regressions
+models may be applied, consider the sample depicted in Figure
+\ref{gnpdata}. In this dataset, the measurements of carbon dioxide
+($\textrm{CO}_{2}$) emissions are plotted versus the gross national
+product (GNP) for $n=28$ countries. These data are included
+\pkg{mixtools}; type \code{help("CO2data")} in \proglang{R} for more
+details.  \citet{hurn} analyzed these data using a mixture of
+regressions from the Bayesian perspective, pointing out that ``there do
+seem to be several groups for which a linear model would be a reasonable
+approximation.''  They further point out that identification of such
+groups could clarify potential development paths of lower GNP countries.
+
+
+\subsection{EM algorithms for mixtures of regressions}
+
+A standard EM algorithm, as described in Section~\ref{section:EM}, may
+be used to find a local maximum of the likelihood surface.  
+\citet{deveaux1989} describes EM algorithms for mixtures of
+regressions in more detail, including proposing a method for
+choosing a starting point in the parameter space.
+The E-step
+is the same as for any finite mixture model EM algorithm; i.e., the
+$p_{ij}^{(t)}$ values are updated according to equation
+(\ref{posteriors})---or, in reality, equation
+(\ref{altposteriors})---where each $\phi_j^{(t)}(\vec x_i)$ is replaced
+in the regression context by $\phi(y_i | \vec x_i^\top\vec\beta_j,
+\sigma_j^2)$:
+\begin{equation}\label{regposteriors}
+  \post_{ij}^{(t)} = \left[ 1 + \sum_{j'\ne j} \frac{ \lambda_{j'}^{(t)} \phi(y_i | \vec x_i^\top\vec\beta_{j'}, \sigma_{j'}^2)}{\lambda_j^{(t)} \phi(y_i | \vec x_i^\top\vec\beta_j, \sigma_j^2)} \right]^{-1}
+\end{equation}
+The update to the $\lambda$ parameters in the M-step, equation
+(\ref{lambda}), is also the same.  Letting
+$\textbf{W}_{j}^{(t)}=\textrm{diag}(\post_{1j}^{(t)},\ldots,\post_{nj}^{(t)})$,
+the additional M-step updates to the $\vec\beta$ and $\sigma$ parameters
+are given by
+\begin{eqnarray}\label{betaEM}
+  \vec{\beta}_{j}^{(t+1)} &=& (\underline{\textbf{X}}^\top\textbf{W}_{j}^{(t)}\underline{\textbf{X}})^{-1}\underline{\textbf{X}}^\top
+  \textbf{W}_{j}^{(t)}\textbf{y}
+  \quad \mbox{and} \\
+\label{sigma}
+\sigma_{j}^{2(t+1)} &=& \frac{\biggl\|\textbf{W}_{j}^{1/2(t)}(\textbf{y}-\underline{\textbf{X}}^\top\vec{\beta}_{j}^{(t+1)})\biggr\|^{2}}{\mbox{tr}(\textbf{W}_{j}^{(t)})},
+\end{eqnarray}
+where $\|\textbf{A}\|^{2}=\textbf{A}^\top\textbf{A}$ and
+$\mbox{tr}(\textbf{A})$ means the trace of the matrix $\textbf{A}$.
+Notice that equation (\ref{betaEM}) is a weighted least squares (WLS)
+estimate of $\vec{\beta}_{j}$ and equation (\ref{sigma}) resembles the
+variance estimate used in WLS.
+
+Allowing each component to have its own error variance $\sigma_j^2$
+results in the likelihood surface having no maximizer, since the
+likelihood may be driven to infinity if one component gives a regression
+surface passing through one or more points exactly and the variance for
+that component is allowed to go to zero.  A similar phenomenon is
+well-known in the finite mixture-of-normals model where the component
+variances are allowed to be distinct \citep{mclachlan2000fmm}.  However,
+in practice we observe this behavior infrequently, and the
+\pkg{mixtools} functions automatically force their EM algorithms to
+restart at randomly chosen parameter values when it occurs.  A local
+maximum of the likelihood function, a consistent version of which is
+guaranteed to exist by the asymptotic theory as long as the model is
+correct and all $\lambda_j$ are positive, usually results without any
+restarts.
+
+The function \code{regmixEM} implements the EM algorithm for mixtures of
+regressions in \pkg{mixtools}.  This function has arguments that control
+options such as adding an intercept term, \code{addintercept = TRUE};
+forcing all $\vec\beta_j$ estimates to be the same, \code{arbmean =
+  FALSE} (for instance, to model outlying observations as having a
+separate error variance from the non-outliers); and forcing all
+$\sigma_j^2$ estimates to be the same, \code{arbvar = FALSE}.  For
+additional details, type \code{help("regmixEM")}.
+
+As an example, we fit a 2-component model to the GNP data shown in
+Figure \ref{gnpdata}.  \citet{hurn} and \citet{youngphd} selected 2
+components for this dataset using model selection criteria, Bayesian
+approaches to selecting the number of components, and a bootstrapping
+approach.  The function \code{regmixEM} will be used for fitting a
+2-component mixture of regressions by an EM algorithm:
+<<results=hide>>=
+data("CO2data")
+attach(CO2data)
+@ 
+<<CO2reg>>=
+CO2reg <- regmixEM(CO2, GNP, lambda = c(1, 3) / 4,
+                   beta = matrix(c(8, -1, 1, 1), 2, 2), sigma = c(2, 1))
+@
+
+We can then pull out the final observed log-likelihood as well as
+estimates for the 2-component fit, which include $\hat{\lambda}$,
+$\hat{\vec{\beta}}_{1}$, $\hat{\vec{\beta}}_{2}$, $\hat{\sigma}_{1}$,
+and $\hat{\sigma}_{2}$:
+<<summaryCO2reg>>=
+summary(CO2reg)
+@
+
+The reader is encouraged to alter the starting values or let the
+internal algorithm generate random starting values.  However, this fit
+seems appropriate and the solution is displayed in Figure \ref{co2EM}
+along with 99\% Working-Hotelling Confidence Bands, which are
+constructed automatically by the \code{plot} method in this case by
+assigning each point to its most probable component and then fitting two
+separate linear regressions:
+
+<<plotCO2reg, eval=FALSE>>=
+plot(CO2reg, density = TRUE, alpha = 0.01, cex.main = 1.5, cex.lab = 1.5,
+     cex.axis = 1.4)
+@
+
+\setkeys{Gin}{width=0.49\textwidth}
+\begin{figure}[!h]
+  \centering
+<<trueplotCO2reg, echo=FALSE, results=tex>>=
+for(i in 1:2){
+    file=paste("CO2reg", i, ".pdf", sep="")
+    pdf(file=file, paper="special", width=6, height=6)
+    plot(CO2reg, whichplots=i, alpha = 0.01, cex.main = 1.5, cex.lab = 1.5,
+         cex.axis = 1.4)
+    dev.off()
+    cat("\\includegraphics{", file, "}\n", sep="")
+}
+@
+\caption{The GNP data fitted with a 2-component parametric EM
+  algorithm in \pkg{mixtools}. Left: the sequence of log-likelihood
+  values, $L_{\Bx}(\f^{(t)})$; Right: the fitted regression lines with
+  99\% Working-Hotelling Confidence Bands.}
+\label{co2EM}
+\end{figure}
+
+
+\subsection{Predictor-dependent mixing proportions}
+\label{section:pdmp}
+
+Suppose that in model (\ref{mor}), we replace $\lambda_j$ by
+$\lambda_{j}(\textbf{x}_{i})$ and assume that the mixing proportions
+vary as a function of the predictors $\textbf{x}_{i}$.  Allowing this
+type of flexibility in the model might be useful for a number of
+reasons.  For instance, sometimes it is the proportions $\lambda_j$ that
+are of primary scientific interest, and in a regression setting it may
+be helpful to know whether these proportions appear to vary with the
+predictors.  As another example, consider a \code{regmixEM} model using
+\code{arbmean = FALSE} in which the mixture structure only concerns the
+error variance: In this case, $\lambda_j(\vec x)$ would give some sense
+of the proportion of outliers in various regions of the predictor space.
+
+One may assume that $\lambda_{j}(\textbf{x})$ has a particular
+parametric form, such as a logistic function, which introduces new
+parameters requiring estimation. This is the idea of the
+\textit{hierarchical mixtures of experts} (HME) procedure
+\citep{jacobsall}, which is commonly used in neural networks and which
+is implemented, for example, in the \pkg{flexmix} package for
+\proglang{R} \citep{jss:Leisch:2004, Grun+Leisch:2008}.  However, a
+parametric form of $\lambda_{j}(\textbf{x})$ may be too restrictive; in
+particular, the logistic function is monotone, which may not
+realistically capture the pattern of change of $\lambda_j$ as a function
+of $\vec x$.  As an alternative, \citet{young2009mor} propose a
+nonparametric estimate of $\lambda_{j}(\textbf{x}_{i})$ that uses ideas
+from kernel density estimation.
+
+The intuition behind the approach of \citet{young2009mor} is as follows:
+The M-step estimate (\ref{lambda}) of $\lambda_j$ at each iteration of a
+finite mixture model EM algorithm is simply an average of the
+``posterior'' probabilities $p_{ij}=\E(Z_{ij}|\mbox{data})$.  As a
+substitute, the nonparametric approach uses local linear regression to
+approximate the $\lambda_j(\textbf{x})$ function.  Considering the case
+of univariate $x$ for simplicity, we set $\lambda_j(x) =
+\hat\alpha_{0j}(x)$, where
+\begin{equation}\label{lambdax}
+(\hat\alpha_{0j}(x), \hat\alpha_{1j}(x))=
+\arg\min_{(\alpha_0, \alpha_1)} \sum_{i=1}^n
+K_h(x-x_i) \left[ p_{ij} - \alpha_0 - \alpha_1(x-x_i) \right]^2
+\end{equation}
+and $K_h(\cdot)$ is a kernel density function with scale parameter
+(i.e., bandwidth) $h$.  It is straightforward to generalize equation
+(\ref{lambdax}) to the case of vector-valued $\vec x$ by using a
+multivariate kernel function.
+
+\citet{young2009mor} give an iterative algorithm for estimating mixture
+of regression parameters that replaces the standard $\lambda_j$ updates
+(\ref{lambda}) by the kernel-weighted version (\ref{lambdax}).  The
+algorithm is otherwise similar to a standard EM; thus, like the
+algorithm in Section~\ref{section:EMlike} of this article, the resulting
+algorithm is an EM-like algorithm.  Because only the $\lambda_j$
+parameters depend on $\vec x$ (and are thus ``locally estimated''),
+whereas the other parameters (the $\vec\beta_j$ and $\sigma_j$) can be
+considered to be globally estimated, \citet{young2009mor} call this
+algorithm an iterative global/local estimation (IGLE) algorithm.
+Naturally, it replaces the usual E-step (\ref{regposteriors}) by a
+modified version in which each $\lambda_j$ is replaced by
+$\lambda_j(x_i)$.
+
+The function \code{regmixEM.loc} implements the IGLE algorithm in
+\pkg{mixtools}. Like the \code{regmixEM} function, \code{regmixEM.loc}
+has the flexibility to include an intercept term by using
+\code{addintercept = TRUE}.  Moreover, this function has the argument
+\code{kern.l} to specify the kernel used in the local estimation of the
+$\lambda_{j}(\textbf{x}_{i})$.  Kernels the user may specify include
+\code{"Gaussian"}, \code{"Beta"}, \code{"Triangle"}, \code{"Cosinus"},
+and \code{"Optcosinus"}.  Further numeric arguments relating to the
+chosen kernel include \code{kernl.g} to specify the shape parameter for
+when \code{kern.l = "Beta"} and \code{kernl.h} to specify the bandwidth
+which controls the size of the window used in the local estimation of
+the mixing proportions. See the corresponding help file for additional
+details.
+
+For the GNP and emissions dataset, Figure \ref{co2EM} indicates that the
+assumption of constant weights for the component regressions across all
+values of the covariate space may not be appropriate.  The countries
+with higher GNP values appear to have a greater probability of belonging
+to the first component (i.e., the red line in Figure \ref{co2EM}).  We
+will therefore apply the IGLE algorithm to this dataset.
+
+We will use the triweight kernel in equation (\ref{lambdax}), which is
+given by setting $\gamma=3$ in
+\begin{equation}\label{beta}
+  K_{h}(x)=\frac{1}{hB(1/2,\gamma+1)}\left(1-\frac{x^2}{h^2}\right)^{\gamma}_{+},
+\end{equation}
+where $B(x,y)=\Gamma(x)\Gamma(y)/\Gamma(x+y)$ is the beta function.  For
+the triweight, $B(1/2, 4)$ is exactly $32/35$.  This kernel may be
+specified in \code{regmixEM.loc} with \code{kern.l = "Beta"} and
+\code{kernl.g = 3}. The bandwidth we selected was $h=20$, which we
+specify with \code{kernl.h = 20}.
+
+For this implementation of the IGLE algorithm, we set the parameter
+estimates and posterior probability estimates 
+obtained from the mixture of regressions EM algorithm as
+starting values for $\hat{\vec{\beta}}_{1}$, $\hat{\vec{\beta}}_{2}$,
+$\hat{\sigma}_{1}$, $\hat{\sigma}_{2}$, and $\lambda(x_{i})$.
+<<CO2igle>>=
+CO2igle <- regmixEM.loc(CO2, GNP, beta = CO2reg$beta, sigma = CO2reg$sigma,
+                        lambda = CO2reg$posterior, kern.l = "Beta",
+                        kernl.h = 20, kernl.g = 3)
+@
+
+We can view the estimates for $\hat{\vec{\beta}}_{1}$,
+$\hat{\vec{\beta}}_{2}$, $\hat{\sigma}_{1}$, and $\hat{\sigma}_{2}$.
+Notice that the estimates are comparable to those obtained for the
+mixture of regressions EM output and the log-likelihood value is
+slightly higher.
+<<CO2iglesummary>>=
+summary(CO2igle)
+@
+
+Next, we can plot the estimates of $\lambda(x_{i})$ from the IGLE
+algorithm.
+
+<<lamplot, eval=FALSE>>=
+plot(GNP, CO2igle$post[,1], xlab = "GNP", cex.axis = 1.4, cex.lab = 1.5,
+  ylab = "Final posterior probabilities")
+lines(sort(GNP), CO2igle$lambda[order(GNP), 1], col=2)
+abline(h = CO2igle$lambda[1], lty = 2)
+@
+
+<<truelamplot, echo=FALSE, results=hide>>=
+pdf("lamplot.pdf")
+plot(GNP, CO2igle$post[,1], xlab = "GNP", cex.axis = 1.4, cex.lab = 1.5,
+  ylab = "Final posterior probabilities")
+lines(sort(GNP), CO2igle$lambda[order(GNP), 1], col=2, lwd=2)
+abline(h = CO2igle$lambda[1], lty = 2, lwd=2)
+dev.off()
+@
+
+This plot is given in Figure \ref{lamplot}.  Notice the curvature
+provided by the estimates from the IGLE fit.  These fits indicate an
+upward trend in the posteriors.  The predictor-dependent mixing
+proportions model provides a viable way to reveal this trend since
+the regular mixture of regressions fit simply provides the same
+estimate of $\lambda$ for all $x_{i}$.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[height=3in,width=3in]{lamplot.pdf}
+  \caption{Posterior membership probabilities $p_{i1}$ for component
+    one versus the predictor GNP along with estimates of
+    $\lambda_1(x)$ from the IGLE algorithm (the solid red curve) and
+    $\lambda_1$ from the mixture of linear regressions EM algorithm
+    (the dashed black line).}
+  \label{lamplot}
+\end{figure}
+
+
+\subsection{Parametric bootstrapping for standard errors}
+
+With likelihood methods for estimation in mixture models, it is possible
+to obtain standard error estimates by using the inverse of the observed
+information matrix when implementing a Newton-type method. However, this
+may be computationally burdensome. An alternative way to report standard
+errors in the likelihood setting is by implementing a parametric
+bootstrap.  \citet{eftib} claim that the parametric bootstrap should
+provide similar standard error estimates to the traditional method
+involving the information matrix.  In a mixture-of-regressions context,
+a parametric bootstrap scheme may be outlined as follows:
+
+\begin{enumerate}
+\item Use \code{regmixEM} to find a local maximizer $\hat{\vec\theta}$
+  of the likelihood.
+\item For each $\textbf{x}_{i}$, simulate a response value $y_{i}^{*}$
+  from the mixture density $g_{\hat{\vec\theta}}(\cdot|\textbf{x}_{i})$.
+\item Find a parameter estimate $\tilde{\vec{\theta}}$ for the bootstrap
+  sample using \code{regmixEM}.
+\item Use some type of check to determine whether label-switching
+  appears to have occurred, and if so, correct it.
+\item Repeat steps 2 through 4 $B$ times to simulate the bootstrap
+  sampling distribution of $\hat{\vec\theta}$.
+\item Use the sample covariance matrix of the bootstrap sample as an
+  approximation to the covariance matrix of $\hat{\vec\theta}$.
+\end{enumerate}
+Note that step 3, which is not part of a standard parametric bootstrap,
+can be especially important in a mixture setting.
+
+The \pkg{mixtools} package implements a parametric bootstrap algorithm
+in the \code{boot.se} function. We may apply it to the regression
+example of this section, which assumes the same estimate of $\lambda$
+for all $x_{i}$, as follows:
+<<CO2boot, results=hide>>=
+set.seed(123)
+CO2boot <- boot.se(CO2reg, B = 100)
+@
+
+This output consists of both the standard error estimates and the
+parameter estimates obtained at each bootstrap replicate.  An
+examination of the slope and intercept parameter estimates of the 500
+bootstrap replicates reveals that no label-switching is likely to have
+occurred.  For instance, the intercept terms of component one range from
+4 to 11, whereas the intercept terms of component two are all tightly
+clumped around 0:
+<<bootresults>>=
+rbind(range(CO2boot$beta[1,]), range(CO2boot$beta[2,]))
+@
+
+We may examine the bootstrap standard error estimates by themselves as follows:
+<<CO2bootse>>=
+CO2boot[c("lambda.se", "beta.se", "sigma.se")]
+@
+
+\section[Additional capabilities of mixtools]{Additional capabilities of
+  \pkg{mixtools}}
+\label{section:misc}
+
+\subsection{Selecting the number of components}
+\label{ss:nbcomp}
+
+Determining the number of components $k$ is still a major contemporary
+issue in mixture modeling.  Two commonly employed techniques are
+information criterion and parametric bootstrapping of the likelihood
+ratio test statistic values for testing
+\begin{eqnarray}\label{mixturetest}
+\nonumber
+H_{0}&:& k = k_{0} \\
+H_{1}&:& k = k_{0}+1
+\end{eqnarray}
+for some positive integer $k_{0}$ \citep{mclach}.
+
+The \pkg{mixtools} package has functions to employ each of these methods
+using EM output from various mixture models. The information criterion
+functions calculate An Information Criterion (AIC) of \citet{aic}, the
+Bayesian Information Criterion (BIC) of \citet{schw}, the Integrated
+Completed Likelihood (ICL) of \citet{biern}, and the consistent AIC
+(CAIC) of \citet{boz}. The functions for performing parametric
+bootstrapping of the likelihood ratio test statistics sequentially test
+$k=k_{0}$ versus $k=k_{0}+1$ for $k_0=1, 2, \ldots$, terminating after
+the bootstrapped $p$-value for one of these tests exceeds a specified
+significance level.
+
+Currently, \pkg{mixtools} has functions for calculating information
+criteria for mixtures of multinomials (\code{multmixmodel.sel}),
+mixtures of multivariate normals under the conditionally i.i.d.\
+assumption (\code{repnormmixmodel.sel}), and mixtures of regressions
+(\code{regmixmodel.sel}). Output from various mixture model fits
+available in \pkg{mixtools} can also be passed to the function
+\code{boot.comp} for the parametric bootstrapping approach.  The
+parameter estimates from these EM fits are used to simulate data from
+the null distribution for the test given in (\ref{mixturetest}).  For
+example, the following application of the \code{multmixmodel.sel}
+function to the water-level multinomial data from
+Section~\ref{section:cut} indicates that either 3 or 4 components seems
+like the best option (no more than 4 are allowed here since there are
+only 8 multinomial trials per observation and the mixture of
+multinomials requires $2m \le r+1$ for identifiability):
+<<modelsel>>=
+<<cutpoint>>
+set.seed(10)
+multmixmodel.sel(watermult, comps = 1:4, epsilon = 0.001)
+@
+
+\citet{youngphd} gives more
+applications of these functions to real datasets.
+
+
+
+\subsection{Bayesian methods}
+
+Currently, there are only two \pkg{mixtools} functions relating to
+Bayesian methodology and they both pertain to analyzing mixtures of
+regressions as described in \citet{hurn}.  The \code{regmixMH} function
+performs a Metropolis-Hastings algorithm for fitting a mixture of
+regressions model where a proper prior has been assumed.  The sampler
+output from \code{regmixMH} can then be passed to \code{regcr} in order
+to construct credible regions of the regression lines.  Type
+\code{help("regmixMH")} and \code{help("regcr")} for details and an
+illustrative example.
+
+
+
+\section*{Acknowledgments}
+This research is partially supported by NSF Award SES-0518772.  DRH
+received additional funding from Le Studium, an agency of the Centre
+National de la Recherche Scientifique of France.
+
+
+\bibliography{mixtools}
+
+
+\end{document}

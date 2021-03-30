@@ -1,0 +1,11 @@
+sample
+SSE.red = 2400
+df.red = 90
+SSE.full = 1950
+df.full = 83
+MSE.full=SSE.full/df.full
+MSE.red=SSE.red/df.red
+n=96
+p=6
+SSE.red/MSE.full-(n-2*p)
+(n-p)*(MSE.red/MSE.full-1)+p
