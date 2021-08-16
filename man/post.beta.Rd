@@ -33,6 +33,7 @@ post.beta(y, x, p.beta, p.z)
   \emph{Journal of Applied Statistics}, \bold{42(7)}, 1421--1441.
 }
 \examples{
+  \dontrun{
 ## EM output for simulated data from 2-component mixture of random effects.
 
 data(RanEffdata)
@@ -59,8 +60,9 @@ p.beta <- em.out$posterior.beta
 p.z <- em.out$posterior.z
 post.beta(y, x.ran, p.beta = p.beta, p.z = p.z)
 }
+}
 \details{
 This is primarily used for within \code{plot.mixEM}.
 }
 
-\keyword{internal}
+\keyword{file}
