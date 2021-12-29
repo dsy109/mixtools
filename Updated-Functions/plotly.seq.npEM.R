@@ -2,9 +2,9 @@ library(mixtools)
 library(plotly)
 
 plotly.seq.npEM <- function(x, col = '#1f77b4' , width = 6,
-                           xlab = "Iteration" , xlab.size = 15 , xtick.size = 15,
-                           ylab.size = 15 , ytick.size = 15,
-                           title.size = 15 , title.x = 0.5 , title.y = 0.95){
+                            xlab = "Iteration" , xlab.size = 15 , xtick.size = 15,
+                            ylab.size = 15 , ytick.size = 15,
+                            title.size = 15 , title.x = 0.5 , title.y = 0.95){
   r <- NCOL(x$data)
   n <- NROW(x$data)
   m <- length(x$lambdahat)
@@ -17,7 +17,7 @@ plotly.seq.npEM <- function(x, col = '#1f77b4' , width = 6,
     # tt <- substitute(expression(paste("sequence of ",lambda[j],
     #                                   ", estimate ",widehat(lambda[j]),"=", estim, sep="")))
     tt <- paste("Sequence of " ,'&#955;',"<sub>",j,"</sub>",
-                " (Estimate ",'&#955;&#x0302;',"<sub>",j,"</sub>","=",estim, ")",sep="")
+                " (Estimated ","&#955;","<sub>",j,"</sub>","=",estim, ")",sep="")
     # ylabel <- substitute(expression(paste(lambda[j],sep="")))
     ylabel <- paste('&#955;',"<sub>",j,"</sub>",sep="")
     plot1 <- plot_ly()%>%
@@ -50,7 +50,7 @@ plotly.seq.npEM <- function(x, col = '#1f77b4' , width = 6,
       # tt <- substitute(expression(paste("sequence of ",mu[j],
       #                                   ", estimate ",widehat(mu[j]),"=",estim,sep="")))
       tt <- paste("Sequence of " ,'&#956;',"<sub>",j,"</sub>",
-                  " (Estimate ",'&#956;&#x0302;',"<sub>",j,"</sub>","=",estim, ")",sep="")
+                  " (Estimated ","&#956;","<sub>",j,"</sub>","=",estim, ")",sep="")
       # ylabel <- substitute(expression(paste(mu[j],sep="")))
       ylabel <- paste('&#956;',"<sub>",j,"</sub>",sep="")
       plot2 <- plot_ly()%>%
