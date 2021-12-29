@@ -4,11 +4,12 @@ library(scales)
 
 plotly.spEMN01 <- function(x, bw=x$bandwidth, knownpdf=dnorm, add.plot=FALSE,
                            width = 3 , col.dens = NULL, col.hist =  '#1f77b4',
-                           title = "" , title.size = 15 , title.x = 0.5 , title.y = 0.95,
+                           title = NULL , title.size = 15 , 
+                           title.x = 0.5 , title.y = 0.95,
                            xlab = "t" , xlab.size = 15 , xtick.size = 15,
                            ylab = "Density" , ylab.size = 15 , ytick.size = 15,
                            legend.text = "Densities" , legend.text.size = 15 , legend.size = 15
-                           ){
+){
   t <- seq(min(x$data), max(x$data), len=200)
   f1 <- x$lambdahat[1]*knownpdf(t)
   f2 <- x$lambdahat[2]*wkde(x$data-x$muhat, u=t-x$muhat, w=x$post[,2], bw=bw, sym=TRUE)
@@ -19,6 +20,9 @@ plotly.spEMN01 <- function(x, bw=x$bandwidth, knownpdf=dnorm, add.plot=FALSE,
   }
   if (length(col.dens) != 3){
     print("Please sepcify 3 colors in 'col.dens'.")
+  }
+  if (is.null(title)){
+    title <- ""
   }
   plot <- plot_ly()%>%
     add_trace(x=t , 
