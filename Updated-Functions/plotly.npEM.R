@@ -1,4 +1,6 @@
+library(plotly)
 library(scales)
+
 plotly.spEM <- plotly.npEM <- function(
   x, blocks = NULL, hist=TRUE, addlegend=TRUE,
   scale = TRUE, title=NULL, breaks="Sturges", 
@@ -10,8 +12,7 @@ plotly.spEM <- plotly.npEM <- function(
   legend.text = "Posteriors",
   legend.text.size = 15,
   legend.size = 15
-  
-){
+  ){
   r <- NCOL(x$data)
   m <- NCOL(x$posteriors)
   if(is.null(dens.col)){
@@ -107,7 +108,7 @@ plotly.spEM <- plotly.npEM <- function(
                     name = 'Data' , showlegend = FALSE,
                     marker = list(color = col.hist,
                                   line = list(color = col.hist))
-                    )%>%
+          )%>%
           layout(bargap = 0.01)
       }
       print(plot.new)
@@ -131,3 +132,8 @@ set.seed(100)
 ## Not run:
 a <- npEM(Waterdata[,3:10], 3, bw=4)
 plotly.npEM(a , newplot = FALSE)
+
+## Next, same thing but pairing clock angles that are directly opposite one
+## another (1:00 with 7:00, 2:00 with 8:00, etc.)
+b <- npEM(Waterdata[,3:10], 3, blockid=c(4,3,2,1,3,4,1,2), bw=4)
+plotly.npEM(b , newplot = FALSE)
