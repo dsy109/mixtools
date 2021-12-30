@@ -1,3 +1,6 @@
+library(mixtools)
+library(plotly)
+
 plotly.mixMCMC <- function(
   x , trace.plot = TRUE , summary.plot = FALSE , burnin = 2000, credit.region = 0.95, col.cr = NULL,
   cex.trace = 3 , width.trace = 3 , 
