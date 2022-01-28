@@ -225,28 +225,28 @@ plotly.mixturegram <- function(
 
 ###### Example ######
 ##Data generated from a 2-component mixture of normals.
-set.seed(100)
-n <- 100
-w <- rmultinom(n,1,c(.3,.7))
-y <- sapply(1:n,function(i) w[1,i]*rnorm(1,-6,1) +
-              w[2,i]*rnorm(1,0,1))
-selection <- function(i,data,rep=30){
-  out <- replicate(rep,normalmixEM(data,epsilon=1e-06,
-                                   k=i,maxit=5000),simplify=FALSE)
-  counts <- lapply(1:rep,function(j)
-    table(apply(out[[j]]$posterior,1,
-                which.max)))
-  counts.length <- sapply(counts, length)
-  counts.min <- sapply(counts, min)
-  counts.test <- (counts.length != i)|(counts.min < 5)
-  if(sum(counts.test) > 0 & sum(counts.test) < rep)
-    out <- out[!counts.test]
-  l <- unlist(lapply(out, function(x) x$loglik))
-  tmp <- out[[which.max(l)]]
-}
-all.out <- lapply(2:5, selection, data = y, rep = 2)
-pmbs <- lapply(1:length(all.out), function(i)
-  all.out[[i]]$post)
-plotly.mixturegram(y, pmbs, method = "pca", all.n = TRUE,
-                   id.con = NULL, score = 1,
-                   title = "Mixturegram (Well-Separated Data)")
+#set.seed(100)
+#n <- 100
+#w <- rmultinom(n,1,c(.3,.7))
+#y <- sapply(1:n,function(i) w[1,i]*rnorm(1,-6,1) +
+#              w[2,i]*rnorm(1,0,1))
+#selection <- function(i,data,rep=30){
+#  out <- replicate(rep,normalmixEM(data,epsilon=1e-06,
+#                                   k=i,maxit=5000),simplify=FALSE)
+#  counts <- lapply(1:rep,function(j)
+#    table(apply(out[[j]]$posterior,1,
+#                which.max)))
+#  counts.length <- sapply(counts, length)
+#  counts.min <- sapply(counts, min)
+#  counts.test <- (counts.length != i)|(counts.min < 5)
+#  if(sum(counts.test) > 0 & sum(counts.test) < rep)
+#    out <- out[!counts.test]
+#  l <- unlist(lapply(out, function(x) x$loglik))
+#  tmp <- out[[which.max(l)]]
+#}
+#all.out <- lapply(2:5, selection, data = y, rep = 2)
+#pmbs <- lapply(1:length(all.out), function(i)
+#  all.out[[i]]$post)
+#plotly.mixturegram(y, pmbs, method = "pca", all.n = TRUE,
+#                   id.con = NULL, score = 1,
+#                   title = "Mixturegram (Well-Separated Data)")
