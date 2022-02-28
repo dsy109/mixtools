@@ -13,7 +13,7 @@ summary.mixEM <- function(object, digits=6, ...){
               "poisregmixEM" = rbind(x$lambda, x$beta),
               "expRMM_EM" = rbind(x$lambda, x$rate),       # Reliability Mixt Model censored exp mixture
               "weibullRMM_SEM" = rbind(x$lambda, x$shape, x$scale), # RMM censored weibull mixture
-              "mvnormalmixEM" = rbind(x$lambda, matrix(unlist(x$mu), byrow=TRUE, nrow=length(x$lambda))),
+              "mvnormalmixEM" = rbind(x$lambda, matrix(unlist(x$mu), byrow=FALSE, ncol=length(x$lambda))),
               "normalmixMMlc" = rbind(x$lambda, x$mu, x$sigma),
               stop("Unknown mixEM object of type ", x$ft))
   colnames(o) <- paste("comp",1:ncol(o))
@@ -30,7 +30,7 @@ summary.mixEM <- function(object, digits=6, ...){
                         "poisregmixEM" = c("lambda", paste("beta", 1:nrow(x$beta), sep="")),
                         "expRMM_EM" = c("lambda", "rate"),
                         "weibullRMM_SEM" = c("lambda", "shape", "scale"),
-                        "mvnormalmixEM" = c("lambda", paste("mu", 1:length(x$mu), sep="")),
+                        "mvnormalmixEM" = c("lambda", paste("mu", 1:length(x$mu[[1]]), sep="")),
                         "normalmixMMlc" = c("lambda", "mu", "sigma"))
 	cat("summary of", x$ft, "object:\n")
 	print(o, digits=digits)
