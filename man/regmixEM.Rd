@@ -64,7 +64,7 @@ de Veaux, R. D. (1989), Mixtures of Linear Regressions,
   Hurn, M., Justel, A. and Robert, C. P. (2003) Estimating Mixtures of Regressions, \emph{Journal 
   of Computational and Graphical Statistics} \bold{12(1)}, 55--79.
   
-  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley \& Sons, Inc.
+  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley and Sons, Inc.
 }
 \examples{
 ## EM output for NOdata.
