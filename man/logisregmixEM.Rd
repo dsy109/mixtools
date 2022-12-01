@@ -49,7 +49,7 @@ logisregmixEM(y, x, N = NULL, lambda = NULL, beta = NULL, k = 2,
 \code{\link{poisregmixEM}}
 }
 \references{
-  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley \& Sons, Inc.
+  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley and Sons, Inc.
 }
 \examples{
 ## EM output for data generated from a 2-component logistic regression model.
