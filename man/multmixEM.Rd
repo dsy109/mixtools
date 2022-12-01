@@ -47,7 +47,7 @@ multmixEM(y, lambda = NULL, theta = NULL, k = 2,
 }
 \references{
   \itemize{
-  \item McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley \& Sons, Inc.
+  \item McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley and Sons, Inc.
   
   \item Elmore, R. T., Hettmansperger, T. P. and Xuan, F. (2004) The Sign Statistic, One-Way Layouts
   and Mixture Models, \emph{Statistical Science} \bold{19(4)}, 579--587.
