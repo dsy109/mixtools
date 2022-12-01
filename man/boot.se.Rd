@@ -28,7 +28,7 @@ boot.se(em.fit, B = 100, arbmean = TRUE, arbvar = TRUE,
   \code{boot.se} returns a list with the bootstrap samples and standard errors for the mixture of interest.
 }
 \references{
-  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley \& Sons, Inc.
+  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley and Sons, Inc.
 }
 \examples{
 ## Bootstrapping standard errors for a regression mixture case.
