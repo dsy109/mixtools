@@ -31,7 +31,7 @@ Plot the components' CDF via the posterior probabilities.
   the points \eqn{(x, CDF(x))} are simply joined by line segments.
 }
 \references{
-  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley \& Sons, Inc.
+  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley and Sons, Inc.
   
   Elmore, R. T., Hettmansperger, T. P. and Xuan, F. (2004) The Sign Statistic, One-Way Layouts
   and Mixture Models, \emph{Statistical Science} \bold{19(4)}, 579--587.
