@@ -55,7 +55,9 @@ wbw.kCV(x, nbfold = 5, w = rep(1, length(x)),
   \item{x}{A vector of values to which local modeling techniques are applied.}
   \item{xi}{An n-vector of data values.}
   \item{h}{The bandwidth controlling the size of the window used for the
-  local estimation around \code{x}.}
+  local estimation around \code{x}.  This pertains to its usage in the kernel functionns
+  \code{kern.B}, \code{kern.C}, \code{kern.G}, \code{kern.O}, and \code{kern.T}.  For its
+  usage in the \code{kfoldCV} function, see updated arguments in the \code{npMSL} function.}
   \item{g}{A shape parameter required for the symmetric beta kernel.  The default
   is \code{g} = 0 which yields the uniform kernel.  Some common values are \code{g} = 1 for the
   Epanechnikov kernel, \code{g} = 2 for the biweight kernel, and \code{g} = 3 for the triweight kernel.}
@@ -63,7 +65,6 @@ wbw.kCV(x, nbfold = 5, w = rep(1, length(x)),
   \item{blockid}{See updated arguments in the \code{npMSL} function.}
   \item{bw}{See updated arguments in the \code{npMSL} function.}
   \item{samebw}{See updated arguments in the \code{npMSL} function.}
-  \item{h}{See updated arguments in the \code{npMSL} function.}
   \item{eps}{See updated arguments in the \code{npMSL} function.}
   \item{maxiter}{See updated arguments in the \code{npMSL} function.}
   \item{bwiter}{See updated arguments in the \code{npMSL} function.}
