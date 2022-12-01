@@ -47,7 +47,7 @@ poisregmixEM(y, x, lambda = NULL, beta = NULL, k = 2,
 \code{\link{logisregmixEM}}
 }
 \references{
-  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley \& Sons, Inc.
+  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley and Sons, Inc.
   
   Wang, P., Puterman, M. L., Cockburn, I. and Le, N.  (1996)
   Mixed Poisson Regression Models with Covariate Dependent Rates, \emph{Biometrics},
