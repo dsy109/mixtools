@@ -50,7 +50,7 @@ mvnormalmixEM(x, lambda = NULL, mu = NULL, sigma = NULL, k = 2,
   \code{\link{normalmixEM}}
 }
 \references{
-  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley \& Sons, Inc.
+  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley and Sons, Inc.
 }
 \examples{
 ##Fitting randomly generated data with a 2-component location mixture of bivariate normals.
