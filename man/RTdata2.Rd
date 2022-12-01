@@ -1,6 +1,6 @@
 \name{RTdata2}
 \docType{data}
-\title{Reaction Time (RT) Data Set \# 2} 
+\title{Reaction Time (RT) Data Set (No. 2)} 
 \alias{RTdata2}
 \usage{
 data(RTdata2)
