@@ -54,7 +54,7 @@ hmeEM(y, x, lambda = NULL, beta = NULL, sigma = NULL, w = NULL,
   Jacobs, R. A., Jordan, M. I., Nowlan, S. J. and Hinton, G. E. (1991) Adaptive Mixtures of Local
   Experts, \emph{Neural Computation} \bold{3(1)}, 79--87.
   
-  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley \& Sons, Inc.
+  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley and Sons, Inc.
 }
 \examples{
 ## EM output for NOdata.
