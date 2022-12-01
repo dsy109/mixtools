@@ -61,7 +61,7 @@ boot.comp(y, x = NULL, N = NULL, max.comp = 2, B = 100,
 \code{\link{poisregmixEM}}, \code{\link{regmixEM}}, \code{\link{regmixEM.mixed}}, \code{\link{repnormmixEM}}
 }
 \references{
-  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley \& Sons, Inc.
+  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley and Sons, Inc.
 }
 \examples{
 ## Bootstrapping to test the number of components on the RTdata.
