@@ -52,7 +52,7 @@ normalmixEM2comp(x, lambda, mu, sigsqrd, eps= 1e-8, maxit = 1000, verb=FALSE)
   \code{\link{mvnormalmixEM}}, \code{\link{normalmixEM}}
 }
 \references{
-  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley \& Sons, Inc.
+  McLachlan, G. J. and Peel, D. (2000) \emph{Finite Mixture Models}, John Wiley and Sons, Inc.
 }
 \examples{
 ##Analyzing the Old Faithful geyser data with a 2-component mixture of normals.
