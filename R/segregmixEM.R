@@ -26,7 +26,7 @@ for(i in 1:k){
 				"\n"))
 		}
 	} 
-	if ((length(seg.Z) != k) | class(seg.Z) != "list") {
+	if ((length(seg.Z) != k) | !inherits(seg.Z, "list", which = TRUE)) {
 		stop(paste("You must specify a list of length k for the segmented relationships!", 
 			"\n"))
 	}
@@ -34,7 +34,7 @@ for(i in 1:k){
 		stop(paste("You must specify a matrix with the correct dimension for psi!", 
 			"\n"))
 	}
-	if (((length(psi.locs) != k) | class(psi.locs) != "list") & !is.null(psi.locs)) {
+	if (((length(psi.locs) != k) | !inherits(psi.locs, "list", which = TRUE)) & !is.null(psi.locs)) {
 		stop(paste("You must specify a list of length k for the number of changepoints per predictor in each component!", 
 			"\n"))
 	}
@@ -42,14 +42,14 @@ for(i in 1:k){
 	tmp.ind=1
 	tmp <- try(suppressWarnings(segregmix.init(y=y, x=x, lambda = lambda, beta = beta, s = sigma, k = k, seg.Z=seg.Z, 
 		psi=psi, psi.locs = psi.locs)),silent=TRUE)
-	if(class(tmp)=="try-error"){
+	if(inherits(tmp, "try-error", which = TRUE)){
 		cat("Generating new initial values.", "\n")
 		while(tmp.ind<=10){
 			tmp <- try(suppressWarnings(segregmix.init(y=y, x=x, lambda = NULL, beta = NULL, s = NULL, k = k, seg.Z=seg.Z, 
 				psi=psi, psi.locs = NULL)),silent=TRUE)
 			tmp.ind <- tmp.ind+1
 			if(tmp.ind==11)  stop(paste("Had to reinitialize algorithm too many times.  Reconsider specified model.", "\n"))
-			if(class(tmp)!="try-error") tmp.ind=20
+			if(!inherits(tmp, "try-error", which = TRUE)) tmp.ind=20
 		}
 	}
 	x.old=x
@@ -107,7 +107,7 @@ for(i in 1:k){
 			if(is.null(seg.Z[[i]]) | (sum(1-sapply(delta,is.null))>0)){
 				temp.seg <- lm(fmla,data=data.x,weights=z[,i])
 			} else temp.seg <- try(suppressWarnings(segmented(lm(fmla,data=data.x,weights=z[,i]),seg.Z=seg.Z[[i]],psi=psi.temp[[i]])),silent=TRUE)
-			if(class(temp.seg)[1]=="try-error"){
+			if(inherits(temp.seg, "try-error", which = TRUE)){
 				seq = 1
 				temp.names = names(psi.locs.old[[i]])
 				while(seq < 20){
@@ -120,7 +120,7 @@ for(i in 1:k){
 					}
 					names(psi.temp2)=temp.names
 					temp.seg <- try(suppressWarnings(segmented(lm(fmla,data=data.x,weights=z[,i]),seg.Z=seg.Z[[i]],psi=psi.temp2[[i]],control=seg.control(it.max=1))),silent=TRUE)
-					if(class(temp.seg)[1]=="try-error"){
+					if(!inherits(temp.seg, "try-error", which = TRUE)){
 						seq = seq+1
 					} else seq=40
 				} 
@@ -131,7 +131,7 @@ for(i in 1:k){
 			lm.out[[i]]=temp.seg			
 		}
 		lambda <- lambda.new
-		if(sum(sapply(lm.out,class)=="try-error")>0){
+		if(sum(sapply(lm.out, inherits, "try-error", which=TRUE))>0){
 			newobsloglik=-Inf
 		} else{
 			if(sum(1-sapply(delta,is.null))>0){
@@ -139,7 +139,7 @@ for(i in 1:k){
 			} else {
 				psi.new <- psi.locs
 				for(i in 1:k){
-					if(class(lm.out[[i]])[1]=="segmented"){
+					if(inherits(lm.out, "segmented", which = TRUE)){
 						temp.names=names(psi.locs[[i]])
 						temp.cumsum=cumsum(sapply(psi.locs[[i]],length))
 						TC.ind = length(temp.cumsum)
@@ -243,7 +243,7 @@ for(i in 1:k){
 			if(sum(1-sapply(delta,is.null))>0) psi.temp=psi.locs
 			tmp <- try(suppressWarnings(segregmix.init(y=y, x=x.old, lambda = NULL, beta = NULL, s = NULL, k = k, seg.Z=seg.Z, 
 				psi=psi, psi.locs = NULL)),silent=TRUE)
-		if(class(tmp)!="try-error") tmp.ind=2
+		if(!inherits(tmp, "try-error", which = TRUE)) tmp.ind=2
 	}
 	lambda <- tmp$lambda
 	beta <- tmp$beta
