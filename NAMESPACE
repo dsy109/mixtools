@@ -5,6 +5,7 @@ export("aug.x")
 export("boot.comp")
 export("boot.se")
 export("compCDF")
+export("dexpmixt")
 export("ddirichlet")
 export("density.npEM")
 export("density.spEM")
@@ -53,6 +54,20 @@ export("plot.spEM")
 export("plot.spEMN01")
 export("plotexpRMM")
 export("plotFDR")
+export("plotly_compCDF")
+export("plotly_ellipse")
+export("plotly_expRMM")
+export("plotly_FDR")
+export("plotly_ise.npEM")
+export("plotly_mixEM")
+export("plotly_mixMCMC")
+export("plotly_mixturegram")
+export("plotly_npEM")
+export("plotly_post.beta")
+export("plotly_seq.npEM")
+export("plotly_spEMN01")
+export("plotly_spRMM")
+export("plotly_weibullRMM")
 export("plotseq.npEM")
 export("plotseq")
 export("plotspRMM")
@@ -78,6 +93,7 @@ export("repnormmix.init")
 export("repnormmixEM")
 export("repnormmixmodel.sel")
 export("rexpmix")
+export("rlnormscalemix")
 export("rmvnorm")
 export("rmvnormmix")
 export("rnormmix")
@@ -104,11 +120,12 @@ export("wquantile")
 
 # Import all packages listed as Imports or Depends
 import(
-  MASS,
+  plotly,
   segmented,
-  stats,
   survival
 )
+import(MASS, except=c(select))
+import(stats, except=c(filter))
 
 # S3 methods
 S3method(density, npEM)
@@ -132,7 +149,8 @@ S3method(summary, spRMM)
 # Import from
 importFrom("kernlab", "kpca", "pcv", "Q")
 importFrom("grDevices", "chull", "adjustcolor", "colors")
-importFrom("graphics", "abline", "barplot", "hist", "layout",
+importFrom("graphics", "abline", "barplot", "hist", 
   "layout.show", "legend", "lines", "par", "plot", "points",
   "segments", "title", "axis", "polygon", "rect")
+importFrom("scales", "hue_pal")
 importFrom("utils", "packageDescription", "tail")
