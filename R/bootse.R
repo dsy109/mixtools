@@ -43,7 +43,7 @@ boot.se <- function (em.fit, B = 100,
                   em.bs = try(regmixEM(y = y.sim, x = x, k = k,
                     arbmean = arbmean, arbvar = arbvar, lambda=em.fit$lambda, beta=em.fit$beta,
                     sigma=(scale*em.fit$sigma), ...), silent = TRUE)
-                  if (class(em.bs) == "try-error" || em.bs$restarts!=0) {
+                  if (inherits(em.bs, "try-error", which = TRUE) || em.bs$restarts!=0) {
                     j = j - 1
                   }
 
@@ -155,7 +155,7 @@ boot.se <- function (em.fit, B = 100,
                   em.bs = try(regmixEM.mixed(y = y.sim, x = x, w=w1, sigma=sigma, mu=mu, alpha=alpha, R=R, 
 					lambda=lambda, k = k, arb.R=arb.R, arb.sigma=arb.sigma, addintercept.fixed=FALSE,
 					addintercept.random=FALSE, ...), silent = TRUE)
-                  if (class(em.bs) == "try-error" || em.bs$restarts!=0) {
+                  if (inherits(em.bs, "try-error", which = TRUE) || em.bs$restarts!=0) {
                     j = j - 1
                   }
 
@@ -263,7 +263,7 @@ R.se1=apply(R.bs,1,sd)
                   em.bs = try(repnormmixEM(x = y.sim,k = k,
                     arbmean = arbmean, arbvar = arbvar, lambda=em.fit$lambda, mu=em.fit$mu,
                     sigma=(scale*em.fit$sigma), ...), silent = TRUE)
-                  if (class(em.bs) == "try-error" || em.bs$restarts!=0) {
+                  if (inherits(em.bs, "try-error", which = TRUE) || em.bs$restarts!=0) {
                     j = j - 1
                   }
 
@@ -337,7 +337,7 @@ R.se1=apply(R.bs,1,sd)
                   em.bs = try(mvnormalmixEM(x = y.sim, k = k,
                     arbmean = arbmean, arbvar = arbvar, lambda=em.fit$lambda, mu=em.fit$mu,
                     sigma=em.fit$sigma, ...), silent = TRUE)
-                  if (class(em.bs) == "try-error" || em.bs$restarts!=0) {
+                  if (inherits(em.bs, "try-error", which = TRUE) || em.bs$restarts!=0) {
                     j = j - 1
                   }
 
@@ -409,7 +409,7 @@ R.se1=apply(R.bs,1,sd)
                   em.bs = try(normalmixEM(x = y.sim, k = k,
                     arbmean = arbmean, arbvar = arbvar, lambda=em.fit$lambda, mu=em.fit$mu,
                     sigma=(scale*em.fit$sigma), ...), silent = TRUE)
-                  if (class(em.bs) == "try-error" || em.bs$restarts!=0) {
+                  if (inherits(em.bs, "try-error", which = TRUE) || em.bs$restarts!=0) {
                     j = j - 1
                   }
 
@@ -470,7 +470,7 @@ lambda<-em.fit$lambda
                   y.sim=t(sapply(1:n,function(i) rmultinom(1,size=n.i[i],prob=theta[(w[,i]==1),]) ))
 
                   em.bs = try(multmixEM(y = y.sim, k = k, lambda=lambda, theta=theta, ...), silent = TRUE)
-                  if (class(em.bs) == "try-error" || em.bs$restarts!=0) {
+                  if (inherits(em.bs, "try-error", which = TRUE) || em.bs$restarts!=0) {
                     j = j - 1
                   }
         
@@ -525,7 +525,7 @@ if (mix.type == "logisregmixEM") {
 
 
                   em.bs = try(logisregmixEM(y = y.sim, x=x, N=N, k = k, lambda=lambda, beta=beta,...), silent = TRUE)
-                  if (class(em.bs) == "try-error" || em.bs$restarts!=0) {
+                  if (inherits(em.bs, "try-error", which = TRUE) || em.bs$restarts!=0) {
                     j = j - 1
                   }
         
@@ -580,7 +580,7 @@ if (mix.type == "poisregmixEM") {
 
 
                   em.bs = try(poisregmixEM(y = y.sim, x=x, k = k, lambda=lambda, beta=beta, ...), silent = TRUE)
-                  if (class(em.bs) == "try-error" || em.bs$restarts!=0) {
+                  if (inherits(em.bs, "try-error", which = TRUE) || em.bs$restarts!=0) {
                     j = j - 1
                   }
         
