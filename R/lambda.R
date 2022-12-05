@@ -1,9 +1,18 @@
-lambda=function (z, x, xi, h = NULL, kernel = c("Gaussian", "Beta", 
-    "Triangle", "Cosinus", "Optcosinus"), g = 0) 
+lambda <- function (z, x, xi, h = NULL, kernel = c("Gaussian", "Beta", 
+                                                 "Triangle", "Cosinus", "Optcosinus"), g = 0) 
 {
   if (is.null(h)) {
     cat("WARNING! BANDWIDTH MUST BE SPECIFIED!", "\n")
   }
+  n <- nrow(xi)
+  p <- ncol(xi)
+  if(length(h)==1) h <- rep(h,p)
+  if(length(h)!=p) {
+    stop("Check the length of the bandwidth h.")
+  } else{
+    h <- matrix(rep(h,each=n),nrow=n)
+  }
+  x <- matrix(rep(x,each=n),nrow=n)
   X.mat=cbind(1,(xi-x))
   kernel <- match.arg(kernel)
   inwindow <- (abs((xi - x)/h) <= 1)
@@ -22,10 +31,11 @@ lambda=function (z, x, xi, h = NULL, kernel = c("Gaussian", "Beta",
   else if (kernel == "Optcosinus") {
     W=(kern.O(x, xi, h) * inwindow)
   }
-  A=try(solve(t(X.mat)%*%(W*X.mat)), silent=TRUE)
-  if(class(A)[1]=="try-error") {
-    A=ginv(t(X.mat)%*%(W*X.mat))
+  W = diag(apply(matrix(W,ncol=ncol(X.mat)-1),1,prod))
+  A=try(solve(t(X.mat)%*%(W%*%X.mat)), silent=TRUE)
+  if(inherits(A, "try-error", which = TRUE)) {
+    A=ginv(t(X.mat)%*%(W%*%X.mat))
   }
-  beta.x=A%*%t(X.mat)%*%(W*z)
+  beta.x=A%*%t(X.mat)%*%(W%*%cbind(z))
   beta.x
 }
