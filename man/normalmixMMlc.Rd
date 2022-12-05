@@ -142,7 +142,7 @@ normalmixMMlc(x, lambda = NULL, mu = NULL, sigma = NULL, k = 2,
   267-278.
   \item Chauveau, D. and Hunter, D.R. (2013)
   	ECM and MM algorithms for mixtures with constrained parameters,
-  	\emph{preprint \url{http://hal.archives-ouvertes.fr/hal-00625285}}.
+  	\emph{preprint \url{https://hal.archives-ouvertes.fr/hal-00625285}}.
   \item Thomas, H., Lohaus, A., and Domsch, H. (2011) Stable Unstable Reliability
         Theory, \emph{British Journal of Mathematical and Statistical Psychology}
         65(2): 201-221.

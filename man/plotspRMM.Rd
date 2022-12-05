@@ -38,7 +38,7 @@ Other models and algorithms for censored lifetime data
    Stochastic EM algorithms for parametric and semiparametric mixture models 
    for right-censored lifetime data, 
    Computational Statistics, Volume 31, Issue 4, pages 1513-1538.
-   \url{http://link.springer.com/article/10.1007/s00180-016-0661-7}
+   \url{https://link.springer.com/article/10.1007/s00180-016-0661-7}
    }
 }
 \author{Didier Chauveau}
