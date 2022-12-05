@@ -50,7 +50,7 @@ previous issues can be searched as well.
 
 ### Authors
 
-Derek S. Young, Tatiana Benaglia, Didier Chauveau, David Hunter, Ryan Elmore, Thomas Hettmansperger, Hoben Thomas, Fengjuan Xua
+Derek S. Young, Tatiana Benaglia, Didier Chauveau, David Hunter, Kedai Cheng, Ryan Elmore, Thomas Hettmansperger, Hoben Thomas, Fengjuan Xua
 
 ### License
 
