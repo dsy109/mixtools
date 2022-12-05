@@ -21,7 +21,7 @@ gammamixEM <- function(x, lambda = NULL, alpha = NULL, beta = NULL, k = 2, mom.s
   
   if(mom.start){
     out <- try(normalmixEM(y,k=k,maxit=5000,epsilon=1e-5,maxrestarts=10),silent=TRUE)
-    if(class(out)=="try-error"){
+    if(inherits(out, "try-error", which = TRUE)){
       tmp <- gammamix.init(x = x, lambda = lambda, alpha = alpha, 
                            beta = beta, k = k)
     } else{
@@ -31,7 +31,7 @@ gammamixEM <- function(x, lambda = NULL, alpha = NULL, beta = NULL, k = 2, mom.s
       shape.mom <- wt.mean^2/wt.var
       scale.mom <- wt.var/wt.mean
       shape.mle <- try(sapply(1:k, function(i) uniroot(fn.alpha,interval=c(0.000001,1000000),beta=1/scale.mom[i],z=z[,i],x=x)$root),silent=TRUE)    
-      if(class(shape.mle)=="try-error") shape.mle <- sapply(1:k, function(i) nlminb(shape.mom[i],fn.alpha.2,lower=0,beta=1/scale.mom[i],z=z[,i],x=x)$par)    
+      if(inherits(shape.mle, "try-error", which = TRUE)) shape.mle <- sapply(1:k, function(i) nlminb(shape.mom[i],fn.alpha.2,lower=0,beta=1/scale.mom[i],z=z[,i],x=x)$par)    
       scale.mle <- sapply(1:k, function(i) 1/fn.beta(z=z[,i],x=x,alpha=shape.mle[i]))
       lambda.mle <- apply(z,2,mean)
       tmp <- list(lambda=lambda.mle,alpha=scale.mle,beta=shape.mle)
@@ -67,7 +67,7 @@ gammamixEM <- function(x, lambda = NULL, alpha = NULL, beta = NULL, k = 2, mom.s
       z <- dens1/apply(dens1, 1, sum)
       #M-step
       shape.mle <- try(sapply(1:k, function(i) uniroot(fn.alpha,interval=c(0.000001,10000),beta=1/old.scale.mle[i],z=z[,i],x=x)$root),silent=TRUE)
-      if(class(shape.mle)=="try-error") shape.mle <- sapply(1:k, function(i) nlminb(old.shape.mle[i],fn.alpha.2,lower=0,beta=1/scale.mle[i],z=z[,i],x=x)$par)
+      if(inherits(shape.mle, "try-error", which = TRUE)) shape.mle <- sapply(1:k, function(i) nlminb(old.shape.mle[i],fn.alpha.2,lower=0,beta=1/scale.mle[i],z=z[,i],x=x)$par)
       scale.mle <- sapply(1:k, function(i) 1/fn.beta(z=z[,i],x=x,alpha=shape.mle[i]))
       lambda.mle <- apply(z,2,mean)
       dens1 <- dens(x=x, lambda=lambda.mle, alpha=shape.mle, beta=scale.mle)
@@ -111,7 +111,7 @@ gammamixEM <- function(x, lambda = NULL, alpha = NULL, beta = NULL, k = 2, mom.s
       z <- dens1/apply(dens1, 1, sum)
       #M-step
       shape.mle <- try(rep(uniroot(fn.alpha2,interval=c(0.000001,10000),beta=1/old.scale.mle,z=z,x=x)$root,k),silent=TRUE)
-      if(class(shape.mle)=="try-error") shape.mle <- rep(nlminb(old.shape.mle[1],fn.alpha2,lower=0,beta=1/old.scale.mle,z=z,x=x)$par,k)
+      if(inherits(shape.mle, "try-error", which = TRUE)) shape.mle <- rep(nlminb(old.shape.mle[1],fn.alpha2,lower=0,beta=1/old.scale.mle,z=z,x=x)$par,k)
       scale.mle <- sapply(1:k, function(i) 1/fn.beta(z=z[,i],x=x,alpha=shape.mle[1]))
       lambda.mle <- apply(z,2,mean)
       dens1 <- dens(x=x, lambda=lambda.mle, alpha=shape.mle, beta=scale.mle)
