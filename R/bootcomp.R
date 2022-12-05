@@ -26,7 +26,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   H1.fit = try(regmixEM(y = y, x = x, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(H1.fit) == "try-error") {
+                  if (inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -49,7 +49,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   em.out = try(regmixEM(y = y.sim, x = x, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(em.out) == "try-error") {
+                  if (inherits(em.out, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -69,8 +69,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   H1.fit = try(regmixEM(y = y, x = x, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(H0.fit) == "try-error" || class(H1.fit) == 
-                    "try-error") {
+                  if (inherits(H0.fit, "try-error", which = TRUE) || inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -118,8 +117,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   em.out.1 = try(regmixEM(y = y.sim, x = x, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(em.out.0) == "try-error" || class(em.out.1) == 
-                    "try-error") {
+                  if (inherits(em.out.0, "try-error", which = TRUE) || inherits(em.out.1, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -150,7 +148,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   H1.fit = try(repnormmixEM(x = y, k = (i + 1), 
                     arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(H1.fit) == "try-error") {
+                  if (inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -174,7 +172,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   em.out = try(repnormmixEM(x = y.sim, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(em.out) == "try-error") {
+                  if (inherits(em.out, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -193,8 +191,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   H1.fit = try(repnormmixEM(x = y, k = (i + 1), 
                     arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(H0.fit) == "try-error" || class(H1.fit) == 
-                    "try-error") {
+                  if (inherits(H0.fit, "try-error", which = TRUE) || inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -238,8 +235,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   em.out.1 = try(repnormmixEM(x = y.sim, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(em.out.0) == "try-error" || class(em.out.1) == 
-                    "try-error") {
+                  if (inherits(em.out.0, "try-error", which = TRUE) || inherits(em.out.1, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -283,7 +279,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   H1.fit = try(mvnormalmixEM(x = y, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(H1.fit) == "try-error") {
+                  if (inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -304,7 +300,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   em.out = try(mvnormalmixEM(x = y.sim, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(em.out) == "try-error") {
+                  if (inherits(em.out, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -323,8 +319,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   H1.fit = try(mvnormalmixEM(x = y, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(H0.fit) == "try-error" || class(H1.fit) == 
-                    "try-error") {
+                  if (inherits(H0.fit, "try-error", which = TRUE) || inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -371,8 +366,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   em.out.1 = try(mvnormalmixEM(x = y.sim, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(em.out.0) == "try-error" || class(em.out.1) == 
-                    "try-error") {
+                  if (inherits(em.out.0, "try-error", which = TRUE) || inherits(em.out.1, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -403,7 +397,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   H1.fit = try(normalmixEM(x = y, k = (i + 1), 
                     arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(H1.fit) == "try-error") {
+                  if (inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -426,7 +420,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   em.out = try(normalmixEM(x = y.sim, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(em.out) == "try-error") {
+                  if (inherits(em.out, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -445,8 +439,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   H1.fit = try(normalmixEM(x = y, k = (i + 1), 
                     arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(H0.fit) == "try-error" || class(H1.fit) == 
-                    "try-error") {
+                  if (inherits(H0.fit, "try-error", which = TRUE) || inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -491,8 +484,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   em.out.1 = try(normalmixEM(x = y.sim, k = (i + 
                     1), arbmean = arbmean, arbvar = arbvar, ...), 
                     silent = TRUE)
-                  if (class(em.out.0) == "try-error" || class(em.out.1) == 
-                    "try-error") {
+                  if (inherits(em.out.0, "try-error", which = TRUE) || inherits(em.out.1, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -524,7 +516,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   Q0[i] = sum(log(exp(apply(y, 1, ldmult, theta = theta))))
                   H1.fit = try(multmixEM(y = y, k = (i + 1), 
                     ...), silent = TRUE)
-                  if (class(H1.fit) == "try-error") {
+                  if (inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -551,7 +543,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                     theta = theta))))
                   em.out = try(multmixEM(y = y.sim, k = (i + 
                     1), ...), silent = TRUE)
-                  if (class(em.out) == "try-error") {
+                  if (inherits(em.out, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -569,8 +561,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                     silent = TRUE)
                   H1.fit = try(multmixEM(y = y, k = (i + 1), 
                     ...), silent = TRUE)
-                  if (class(H0.fit) == "try-error" || class(H1.fit) == 
-                    "try-error") {
+                  if (inherits(H0.fit, "try-error", which = TRUE) || inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -601,8 +592,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                     ...), silent = TRUE)
                   em.out.1 = try(multmixEM(y = new.y.sim, k = (i + 
                     1), ...), silent = TRUE)
-                  if (class(em.out.0) == "try-error" || class(em.out.1) == 
-                    "try-error") {
+                  if (inherits(em.out.0, "try-error", which = TRUE) || inherits(em.out.1, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -635,7 +625,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   Q0[i] = logLik(H0.fit)
                   H1.fit = try(logisregmixEM(y = y, x = x, N = N, 
                     k = (i + 1), ...), silent = TRUE)
-                  if (class(H1.fit) == "try-error") {
+                  if (inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -659,7 +649,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                     family = binomial())
                   em.out = try(logisregmixEM(y = y.sim, x = x, 
                     N = N, k = (i + 1), ...), silent = TRUE)
-                  if (class(em.out) == "try-error") {
+                  if (inherits(em.out, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -677,8 +667,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                     k = i, ...), silent = TRUE)
                   H1.fit = try(logisregmixEM(y = y, x = x, N = N, 
                     k = (i + 1), ...), silent = TRUE)
-                  if (class(H0.fit) == "try-error" || class(H1.fit) == 
-                    "try-error") {
+                  if (inherits(H0.fit, "try-error", which = TRUE) || inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -706,8 +695,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                     N = N, k = i, ...), silent = TRUE)
                   em.out.1 = try(logisregmixEM(y = y.sim, x = x, 
                     N = N, k = (i + 1), ...), silent = TRUE)
-                  if (class(em.out.0) == "try-error" || class(em.out.1) == 
-                    "try-error") {
+                  if (inherits(em.out.0, "try-error", which = TRUE) || inherits(em.out.1, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -737,7 +725,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   Q0[i] = logLik(H0.fit)
                   H1.fit = try(poisregmixEM(y = y, x = x, k = (i + 
                     1), ...), silent = TRUE)
-                  if (class(H1.fit) == "try-error") {
+                  if (inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -760,7 +748,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                   xy.simout = glm(y.sim ~ x, family = poisson())
                   em.out = try(poisregmixEM(y = y.sim, x = x, 
                     k = (i + 1), ...), silent = TRUE)
-                  if (class(em.out) == "try-error") {
+                  if (inherits(em.out, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
@@ -778,8 +766,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                     ...), silent = TRUE)
                   H1.fit = try(poisregmixEM(y = y, x = x, k = (i + 
                     1), ...), silent = TRUE)
-                  if (class(H0.fit) == "try-error" || class(H1.fit) == 
-                    "try-error") {
+                  if (inherits(H0.fit, "try-error", which = TRUE) || inherits(H1.fit, "try-error", which = TRUE)) {
                     w = 1
                   }
                   else {
@@ -806,8 +793,7 @@ boot.comp <- function (y, x = NULL, N = NULL, max.comp = 2, B = 100, sig = 0.05,
                     k = i, ...), silent = TRUE)
                   em.out.1 = try(poisregmixEM(y = y.sim, x = x, 
                     k = (i + 1), ...), silent = TRUE)
-                  if (class(em.out.0) == "try-error" || class(em.out.1) == 
-                    "try-error") {
+                  if (inherits(em.out.0, "try-error", which = TRUE) || inherits(em.out.1, "try-error", which = TRUE)) {
                     j = j - 1
                   }
                   else {
