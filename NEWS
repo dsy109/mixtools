@@ -1,3 +1,28 @@
+Changes in mixtools 2.0.0
+============================
+* 2022-12-05
+
+* Updates included in this major release were due to funding received from the Chan Zuckerberg Initiative: Essential Open Source Software for Science (Grant No. 2020-255193).  This has been added to both the DESCRIPTION file and the zzz.R file.
+
+* Updated all graphics functions to use plotly.  These new functions are prefaced by "plotly_".  All of the original plotting functions that used base R graphics are still included in order to maintain backwards compatibility.
+
+* Launched a GitHub repo for mixtools, which has been added to DESCRIPTION.  Bug requests can be submitted through the repo.
+
+* Modified the NAMESPACE to import the necessary functions from the scales package as well as export all of the newly-created plotly graphics functions.
+
+* Modified the summary.mixEM() function to fix some output inconsistencies when analyzing results from mvnormalmixEM().
+
+* Changed conditional tests for the class of certain objects to use the inherits() function.  The affected functions are boot.comp(), boot.se(), gammamixEM(), and segremixEM().
+
+* Generalized the regmixEM.loc() and lambda() functions to allow multiple predictors.  The previous versions only accepted a single predictor even though the documentation mistakenly indicated multiple predictors.  The revised functions use a product kernel in the calculation if inputting multiple predictors.  Thanks to Julio Trecenti for pointing this out.
+
+* Updated links to URLs found in various .Rd files and the CITATION file.
+
+* Added Kedai Cheng (UNC - Asheville) as an author of the package.
+
+* Resolved issues noted on CRAN regarding escaped LaTeX specials in certain .Rd files. 
+
+
 Changes in mixtools 1.2.0
 ============================
 * 2020-02-05
