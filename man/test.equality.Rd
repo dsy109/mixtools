@@ -25,7 +25,7 @@ test.equality(y, x = NULL, arbmean = TRUE, arbvar = FALSE,
   \item{mu}{An optional vector for starting values (under the null hypothesis) for \code{mu} in \code{normalmixEM}.}
   \item{sigma}{An optional vector for starting values (under the null hypothesis) for \code{sigma} in \code{normalmixEM} or \code{regmixEM}.}
   \item{beta}{An optional matrix for starting values (under the null hypothesis) for \code{beta} in \code{regmixEM}.}
-  \item{lambda}{An otional vector for starting values (under the null hypothesis) for \code{lambda} in \code{normalmixEM} or \code{regmixEM}.}
+  \item{lambda}{An optional vector for starting values (under the null hypothesis) for \code{lambda} in \code{normalmixEM} or \code{regmixEM}.}
   \item{...}{Additional arguments passed to the various EM algorithms for the mixture of interest.} 
 }
 \value{
