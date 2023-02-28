@@ -84,7 +84,7 @@ plotly_mixEM <-function (x,
                                   x=x , 
                                   y=mix.object$lambda[i] *
                                     dgamma(x, shape = mix.object$gamma.pars[1,i],
-                                           rate = mix.object$gamma.pars[2, i]), 
+                                           rate = 1/(mix.object$gamma.pars[2, i])), 
                                   type = 'scatter' , mode = 'lines',
                                   line = list(width = lwd2 , color = col2[i]),
                                   name = paste("Component" , i) , showlegend = FALSE)
