@@ -12,11 +12,10 @@ plotly_mixEM <-function (x,
                          title2.x = 0.5,title2.y=0.95, col.hist = "#1f77b4",
                          col2=NULL, lwd2=3, cex2=6,
                          alpha = 0.05, marginal = FALSE){
-  def.par <- par(ask=(loglik + density > 1), "mar") # only ask and mar are changed
+  def.par <- par(ask=(loglik + density > 1), "mar") 
   mix.object <- x
   if (!inherits(mix.object, "mixEM"))
     stop("Use only with \"mixEM\" objects!")
-  ### iteration plot ###
   if (loglik) {
     plot.loglik <- plot_ly()%>%
       add_trace(x= seq(from=1 , to=length(mix.object$all.loglik) , by=1), 
@@ -41,8 +40,56 @@ plotly_mixEM <-function (x,
       )
     print(plot.loglik)
   }
-  ### density plot ###
   if (density){
+    if (mix.object$ft == "gammamixEM") {
+      k <- ncol(mix.object$posterior)
+      x <- sort(mix.object$x)
+      a <- hist(x, plot = FALSE)
+      maxy <- max(max(a$density), 0.3989*mix.object$lambda/mix.object$sigma)
+      if(is.null(title2)) { title2 <- "Density Curves" }
+      if(is.null(xlab2)) { xlab2 <- "Data" }
+      if (is.null(col2)){
+        col2 <- hue_pal()(k)
+      }
+      if (length(col2) != k){
+        print(paste("Please specify" , k , "colors in 'col2'."))
+      }
+      
+      plot.density <- plot_ly()%>%
+        add_trace(x=x ,
+                  type = 'histogram', histnorm = "probability density",
+                  name = 'Data' , showlegend = FALSE,
+                  marker = list(color = col.hist,
+                                line = list(color = col.hist))
+        )%>%
+        plotly::layout(
+          title = list(text = title2,
+                       x = title2.x,
+                       y = title2.y,
+                       font = list(size=title2.size)
+          ),
+          xaxis = list(title = list(text = xlab2,
+                                    font = list(size = xlab2.size)),
+                       tickfont = list(size = xtick2.size)
+          ),
+          yaxis = list(title = list(text = ylab2,
+                                    font = list(size = ylab2.size)),
+                       tickfont = list(size = ytick2.size),
+                       range = c(0 , maxy)
+          ),
+          bargap = 0.01
+        )
+      for (i in 1:k) {
+        plot.density <- add_trace(plot.density,
+                                  x=x , 
+                                  y=mix.object$lambda[i] *
+                                    dgamma(x, shape = mix.object$gamma.pars[1,i],
+                                           rate = mix.object$gamma.pars[2, i]), 
+                                  type = 'scatter' , mode = 'lines',
+                                  line = list(width = lwd2 , color = col2[i]),
+                                  name = paste("Component" , i) , showlegend = FALSE)
+      }
+    }
     if (mix.object$ft == "logisregmixEM") {
       if (ncol(mix.object$x) != 2) {
         stop("The predictors must have 2 columns!")
@@ -365,10 +412,8 @@ plotly_mixEM <-function (x,
     }
     print(plot.density)
     
-#    if (mix.object$ft == "expRMM_EM") {plotexpRMM(mix.object, ...)} # all default
-#    if (mix.object$ft == "weibullRMM_SEM") {plotweibullRMM(mix.object, ...)} # all default
-    if (mix.object$ft == "expRMM_EM") {plotly_expRMM(mix.object)} # all default
-    if (mix.object$ft == "weibullRMM_SEM") {plotly_weibullRMM(mix.object)} # all default
+    if (mix.object$ft == "expRMM_EM") {plotly_expRMM(mix.object)} 
+    if (mix.object$ft == "weibullRMM_SEM") {plotly_weibullRMM(mix.object)} 
   }
-  par(def.par) # reset ask and mar to original values
+  par(def.par) 
 }
