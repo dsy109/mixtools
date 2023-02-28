@@ -1,3 +1,10 @@
+Changes in mixtools 2.x.x
+============================
+* 202x-xx-xx
+
+* Updated plotly_mixEM() so as to allow plotting of results from gammamixEM().
+
+
 Changes in mixtools 2.0.0
 ============================
 * 2022-12-05
