@@ -39,31 +39,33 @@ plotly_compCDF <- function(data,
   cdfs <- bc %*% weights[,comp,drop=FALSE]
   
   if(makeplot) {
-    plot <- plot_ly()
+    plot <- plot_ly() %>%
+      layout(
+        title = list(text = title,
+                     x = title.x,
+                     y = title.y,
+                     font = list(size=title.size)),
+        xaxis = list(title = list(text = xlab,
+                                  font = list(size = xlab.size)),
+                     tickfont = list(size = xtick.size)
+        ),
+        yaxis = list(title = list(text = ylab,
+                                  font = list(size = ylab.size)),
+                     tickfont = list(size = ytick.size),
+                     range = c(0 , 1)
+        )
+      )
     for (i in 1:length(comp)) {
-      plot <- add_trace(plot,
-                        plot,
-                        x=x , y=cdfs[,comp[i]] , type = 'scatter' , mode = 'lines+markers',
-                        marker = list(size = cex , color = col.comp[i]),
-                        line = list(width = width , color = col.comp[i]),
-                        name = comp[i] , showlegend = TRUE) %>%
-        plotly::layout(
+      plot <- plot %>%
+        add_trace(x=x , y=cdfs[,comp[i]] , 
+                  type = 'scatter' , mode = 'lines+markers',
+                  marker = list(size = cex , color = col.comp[i]),
+                  line = list(width = width , color = col.comp[i]),
+                  name = comp[i] , showlegend = TRUE) %>%
+        layout(
           legend = list(title=list(text=legend.text,
                                    font=list(size=legend.text.size)),
-                        font = list(size=legend.size)),
-          title = list(text = title,
-                       x = title.x,
-                       y = title.y,
-                       font = list(size=title.size)),
-          xaxis = list(title = list(text = xlab,
-                                    font = list(size = xlab.size)),
-                       tickfont = list(size = xtick.size)
-          ),
-          yaxis = list(title = list(text = ylab,
-                                    font = list(size = ylab.size)),
-                       tickfont = list(size = ytick.size),
-                       range = c(0 , 1)
-          )
+                        font = list(size=legend.size))
         )
     }
     print(plot)
