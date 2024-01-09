@@ -30,7 +30,13 @@ normalmixEM2comp(x, lambda, mu, sigsqrd, eps= 1e-8, maxit = 1000, verb=FALSE)
   
   Note that when the two components are assumed to have unequal variances,
   the loglikelihood is unbounded.  However, in practice this is rarely a problem
-  and quite often the algorithm converges to a "nice" local maximum.
+  and quite often the algorithm converges to a "nice" local maximum.  Since this 
+  algorithm requires starting values for all parameters, it is recommended that the 
+  user initialize this routine from different starting values to gauge the reasonableness 
+  of the outputted solutions.  Cases where, say, the components are not well-separated 
+  and/or the component variances are somewhat similar, may have quite different estimates 
+  depending on the starting values used.  Such situations could also be accompanied by slow 
+  convergence of the algorithm relative to the convergence criteria used.
 }
 \value{
   \code{normalmixEM2comp} returns a list of class \code{mixEM} with items:
