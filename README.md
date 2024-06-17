@@ -3,7 +3,7 @@
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)	
 ![CRAN/METACRAN](https://img.shields.io/cran/l/mixtools)	
 [![CRAN status](https://www.r-pkg.org/badges/version/mixtools)](https://CRAN.R-project.org/package=mixtools)
-[![Dependencies](https://tinyverse.netlify.com/badge/mixtools)](https://cran.r-project.org/package=mixtools)
+[![Dependencies](https://tinyverse.netlify.app/badge/mixtools)](https://cran.r-project.org/package=mixtools)
 ![GitHub last commit](https://img.shields.io/github/last-commit/dsy109/mixtools)
 [![Downloads](https://cranlogs.r-pkg.org/badges/mixtools?color=brightgreen)](https://www.r-pkg.org/pkg/mixtools)
 [![JSS](https://img.shields.io/badge/JSS-10.18637%2Fjss.v032.i06-brightgreen)](http://dx.doi.org/10.18637/jss.v032.i06)
